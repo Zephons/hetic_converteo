@@ -2,6 +2,7 @@
 *log
 *.csv
 *.xlsx
+!sample.xlsx
 \.idea
 
 # secretdir
