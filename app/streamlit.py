@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import numpy as np
+import pandas as pd
 
 progress_bar = st.sidebar.progress(0)
 status_text = st.sidebar.empty()
@@ -19,3 +20,8 @@ for i in range(1, 101):
 progress_bar.empty()
 
 st.button('Re-run')
+
+st.header('Group 9')
+
+df_casto = pd.read_excel("data/sample.xlsx", header=[1])
+st.dataframe(df_casto)
