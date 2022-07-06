@@ -2,7 +2,9 @@
 *log
 *.csv
 *.xlsx
+!departements-france.csv
 !sample.xlsx
+!
 \.idea
 
 # secretdir

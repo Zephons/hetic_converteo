@@ -22,6 +22,27 @@ progress_bar.empty()
 st.button('Re-run')
 
 st.header('Group 9')
-
 df_casto = pd.read_excel("data/sample.xlsx", header=[1])
 st.dataframe(df_casto)
+df_casto_google = df_casto[df_casto['Platform'] == 'GOOGLE_MY_BUSINESS']
+
+import plotly.express as px
+# On rajoute une colonne rating moyen par ville.
+Avg_city_rating = df_casto_google[['City','Rating']]
+Avg_city_rating = Avg_city_rating.groupby('City', as_index=False)['Rating'].mean()
+Avg_city_rating['Rating'] = Avg_city_rating['Rating'].round(2)
+
+# On retrouve les departements à partir des adresses.
+df_departements = pd.read_csv('data/departements-france.csv')
+df_departements['code_departement'] = df_departements['code_departement'].astype('str')
+df_departements['code_departement'] = df_departements['code_departement'].apply(lambda x: x if len(x) > 1 else '0'+x)
+Region_dict = dict(zip(df_departements['code_departement'],df_departements['nom_region']))
+Depart_dict = dict(zip(df_departements['code_departement'],df_departements['nom_departement']))
+avg_rating_dict = dict(zip(Avg_city_rating['City'],Avg_city_rating['Rating']))
+df_casto_google['Region'] = df_casto_google['Zipcode'].map(Region_dict)
+df_casto_google['Departement'] = df_casto_google['Zipcode'].map(Depart_dict)
+df_casto_google['average_rating'] = df_casto_google['City'].map(avg_rating_dict)
+fig = px.scatter(df_casto_google, x="average_rating", y="City",
+         size="average_rating", color="City",
+                 hover_name="City", log_x=True, size_max=15)
+st.plotly_chart(fig)
