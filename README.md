@@ -3,3 +3,5 @@
 3. Create a virtual environment: `pipenv install`
 4. Enter the virtual environment: `pipenv shell`
 5. Launch a Streamlit application: `streamlit run app/streamlit.py`
+
+Deployed application: https://reviews-castorama.herokuapp.com/

@@ -3,6 +3,8 @@ import time
 import numpy as np
 import pandas as pd
 
+st.set_page_config(page_title='Dashboard Castorama', page_icon=None, layout='centered', initial_sidebar_state='auto', menu_items=None)
+
 progress_bar = st.sidebar.progress(0)
 status_text = st.sidebar.empty()
 
