@@ -1,7 +1,9 @@
+import os
 import streamlit as st
-import time
 import numpy as np
 import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 
 st.set_page_config(page_title='Dashboard Casto', page_icon=None, layout='centered', initial_sidebar_state='auto', menu_items=None)
 
@@ -22,7 +24,15 @@ progress_bar.empty()
 st.button('Re-run')
 
 st.header('Group 9')
-df_casto = pd.read_excel("data/sample.xlsx", header=[1])
+
+postgresql_uri = os.environ["DATABASE_URL"]
+engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
+sql = '''
+    SELECT * FROM public.sample;
+'''
+with engine.connect() as conn:
+    query = conn.execute(text(sql))
+df_casto = pd.DataFrame(query.fetchall())
 st.dataframe(df_casto)
 df_casto_google = df_casto[df_casto['Platform'] == 'GOOGLE_MY_BUSINESS']
 
