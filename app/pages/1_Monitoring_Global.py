@@ -10,7 +10,10 @@ st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="cen
 postgresql_uri = os.environ["DATABASE_URL"]
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-# Pie chart
+# Line chart Rating
+
+
+# Pie chart Sentiment
 sql_pie_chart = """
     SELECT "Sentiment", sum("Count") FROM public.pie_chart group by "Sentiment";
 """

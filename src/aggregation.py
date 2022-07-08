@@ -15,7 +15,11 @@ df = pd.read_excel("data/raw_datas_projet_M5D_Hetic.xlsx", header=[1], dtype={"Z
 df_preprocessed = preprocess(df)
 df_enriched = enrich(df_preprocessed)
 
-# Table pour pie chart
-df_pie = df_enriched.groupby(['Business Id', 'Sentiment'])['Sentiment'].count().reset_index(name="Count")
+# # Table pour line chart Rating
+
+
+
+# Table pour pie chart Sentiment
+df_pie = df_enriched.groupby(["Shop", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie.to_sql(name="pie_chart", con=engine, if_exists="replace")
 
