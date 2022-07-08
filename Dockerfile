@@ -6,4 +6,5 @@ COPY Pipfile .
 RUN pipenv install
 COPY app ./
 COPY data ./
+COPY src ./
 ENTRYPOINT ["pipenv", "run", "streamlit", "run", "app/streamlit.py"]
