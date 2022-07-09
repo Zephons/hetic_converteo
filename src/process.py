@@ -23,5 +23,5 @@ def enrich(df_preprocessed: pd.DataFrame) -> pd.DataFrame:
     # Feature engineering. On déduit les Sentiments à partir des Ratings.
     df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Negative" if x<3 else ("Neutral" if x==3 else "Positive"))
     # Feature engineering. On merge la ville et l"adresse pour désigner le magasin.
-    df_preprocessed["Shop"] = df_preprocessed[["City", "Address"]].apply(lambda x: ", ".join([x["City"], re.sub(r"\d+\sb\s|^\d+-\d+\s|^\d+\s", "", x["Address"]).title()]), axis=1)
+    df_preprocessed["Address Without Number"] = df_preprocessed["Address"].apply(lambda x: re.sub(r"\d+\sb\s|^\d+-\d+\s|^\d+\s", "", x).title())
     return df_preprocessed

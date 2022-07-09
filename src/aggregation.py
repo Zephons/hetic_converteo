@@ -20,6 +20,6 @@ df_enriched = enrich(df_preprocessed)
 
 
 # Table pour pie chart Sentiment
-df_pie = df_enriched.groupby(["Shop", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
+df_pie = df_enriched.groupby(["City", "Address Without Number", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie.to_sql(name="pie_chart", con=engine, if_exists="replace")
 

@@ -10,16 +10,23 @@ st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="cen
 postgresql_uri = os.environ["DATABASE_URL"]
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-# Selectionner un magasin
-sql_shop = """
-    SELECT DISTINCT "Shop" FROM public.pie_chart;
+# Selectionner une ville
+sql_city = """
+    SELECT DISTINCT "City" FROM public.pie_chart;
 """
-df_shop = pd.read_sql_query(sql_shop, engine)
-selected_shop = st.sidebar.selectbox("Sélectionner un magasin: ", df_shop["Shop"])
+df_city = pd.read_sql_query(sql_city, engine)
+selected_city = st.sidebar.selectbox("Ville :", df_city["City"])
+
+# Selectionner une adresse
+sql_address = f"""
+    SELECT DISTINCT "Address Without Number" FROM public.pie_chart WHERE "City" = $${selected_city}$$;
+"""
+df_address = pd.read_sql_query(sql_address, engine)
+selected_address = st.sidebar.selectbox("Adresse :", df_address["Address Without Number"])
 
 # Pie chart Sentiment
 sql_pie_chart = f"""
-    SELECT "Sentiment", sum("Count") FROM public.pie_chart WHERE "Shop" = '{selected_shop}' group by "Sentiment";
+    SELECT "Sentiment", sum("Count") FROM public.pie_chart WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ group by "Sentiment";
 """
 df_pie_chart = pd.read_sql_query(sql_pie_chart, engine)
 fig = px.pie(names=df_pie_chart["Sentiment"], values=df_pie_chart["sum"])
