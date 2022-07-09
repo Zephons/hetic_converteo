@@ -15,6 +15,8 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df_google = df_google[cols_to_keep]
     # Nettoyage. On enlève les tabulations dans les noms de ville.
     df_google["City"] = df_google["City"].str.strip()
+    # Nettoyage. On unifie la forme des adresse (sans numéro).
+    df_google["Address Without Number"] = df_google["Address"].apply(lambda x: re.sub(r"\d+\sb\s|^\d+-\d+\s|^\d+\s", "", x).title())
     # Imputation. On complète les Group name à partir des Zip code.
     df_google["Group name"] = df_google[["Group name", "Zipcode"]].apply(lambda x: assign_group_name(x["Zipcode"]) or x["Group name"], axis=1)
     return df_google
@@ -22,6 +24,6 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 def enrich(df_preprocessed: pd.DataFrame) -> pd.DataFrame:
     # Feature engineering. On déduit les Sentiments à partir des Ratings.
     df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Negative" if x<3 else ("Neutral" if x==3 else "Positive"))
-    # Feature engineering. On merge la ville et l"adresse pour désigner le magasin.
-    df_preprocessed["Address Without Number"] = df_preprocessed["Address"].apply(lambda x: re.sub(r"\d+\sb\s|^\d+-\d+\s|^\d+\s", "", x).title())
+    # Feature engineering. On extrait la date à partir de la date de création.
+    df_preprocessed["Date"] = df_preprocessed["Creation date"].dt.date
     return df_preprocessed

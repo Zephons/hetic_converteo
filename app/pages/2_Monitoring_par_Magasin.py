@@ -10,26 +10,32 @@ st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="cen
 postgresql_uri = os.environ["DATABASE_URL"]
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-# Sélectionner une ville
+# Sélectionner une ville.
 sql_city = """
-    SELECT DISTINCT "City" FROM public.city_address;
+    SELECT DISTINCT "City" FROM public.city_address_date;
 """
 df_city = pd.read_sql_query(sql_city, engine)
 selected_city = st.sidebar.selectbox("Ville :", df_city["City"])
 
-# Sélectionner une adresse
+# Sélectionner une adresse.
 sql_address = f"""
-    SELECT DISTINCT "Address Without Number" FROM public.city_address WHERE "City" = $${selected_city}$$;
+    SELECT DISTINCT "Address Without Number" FROM public.city_address_date WHERE "City" = $${selected_city}$$;
 """
 df_address = pd.read_sql_query(sql_address, engine)
 selected_address = st.sidebar.selectbox("Adresse :", df_address["Address Without Number"])
 
-# Sélectionner une date de début
-
+# Sélectionner les dates de début et de fin.
+sql_dates = f"""
+    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.city_address_date WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
+"""
+df_dates = pd.read_sql_query(sql_dates, engine)
+min_date, max_date = df_dates.values[0]
+selected_min_date = st.sidebar.date_input("Date de début :", value=min_date, min_value=min_date, max_value=max_date)
+selected_max_date = st.sidebar.date_input("Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
 
 # Pie chart Sentiment
 sql_pie_chart = f"""
-    SELECT "Sentiment", sum("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ group by "Sentiment";
+    SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
 """
 df_pie_chart = pd.read_sql_query(sql_pie_chart, engine)
 fig = px.pie(names=df_pie_chart["Sentiment"], values=df_pie_chart["Sum"])
