@@ -15,11 +15,13 @@ df = pd.read_excel("data/raw_datas_projet_M5D_Hetic.xlsx", header=[1], dtype={"Z
 df_preprocessed = preprocess(df)
 df_enriched = enrich(df_preprocessed)
 
-# # Table pour line chart Rating
+# print(df_enriched["Creation date"].dt.date.nunique())
 
+# Table pour les villes
+df_city_address = df_enriched[["City", "Address Without Number"]].drop_duplicates().sort_values(by=["City", "Address Without Number"], ignore_index=True)
+df_city_address.to_sql(name="city_address", con=engine, if_exists="replace")
 
-
-# Table pour pie chart Sentiment
-df_pie = df_enriched.groupby(["City", "Address Without Number", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
-df_pie.to_sql(name="pie_chart", con=engine, if_exists="replace")
+# Table pour le pie chart Sentiment
+df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
+df_pie_chart_sentiment.to_sql(name="pie_chart_sentiment", con=engine, if_exists="replace")
 

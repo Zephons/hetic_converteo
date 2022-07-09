@@ -15,8 +15,8 @@ engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 # Pie chart Sentiment
 sql_pie_chart = """
-    SELECT "Sentiment", sum("Count") FROM public.pie_chart group by "Sentiment";
+    SELECT "Sentiment", sum("Count") AS "Sum" FROM public.pie_chart_sentiment group by "Sentiment";
 """
 df_pie_chart = pd.read_sql_query(sql_pie_chart, engine)
-fig = px.pie(names=df_pie_chart["Sentiment"], values=df_pie_chart["sum"])
+fig = px.pie(names=df_pie_chart["Sentiment"], values=df_pie_chart["Sum"])
 st.plotly_chart(fig)
