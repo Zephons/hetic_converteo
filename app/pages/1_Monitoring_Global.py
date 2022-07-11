@@ -23,13 +23,14 @@ selected_max_date = st.sidebar.date_input("Date de fin :", value=max_date, min_v
 
 # Metric nombre d'avis.
 sql_metrics = f"""
-    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
 """
 df_metrics = pd.read_sql_query(sql_metrics, engine)
-sum_comments, aggregated_average_rating = df_metrics.values[0]
+sum_comments, sum_ratings, aggregated_average_rating = df_metrics.values[0]
 metric_col1, metric_col2, metric_col3 = st.columns(3)
 metric_col1.metric("Nombre d'avis", sum_comments)
-metric_col2.metric("Note moyenne", f"{aggregated_average_rating} / 5")
+metric_col2.metric("Nombre de notes", sum_ratings)
+metric_col3.metric("Note moyenne", f"{aggregated_average_rating} / 5")
 
 # Pie chart Sentiment
 sql_pie_chart = f"""
