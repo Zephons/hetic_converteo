@@ -1,11 +1,18 @@
 import os
 import re
 import pandas as pd
+import streamlit as st
 
 from methods import assign_group_name
 
 
 postgresql_uri = os.environ["DATABASE_URL"]
+
+# TODO If this function is launched for the Streamlit interface, @st.cache must be used to decorate this function.
+def load(path: str) -> pd.DataFrame:
+    # On force le type de la colonne Zipcode en string.
+    df = pd.read_excel(path, header=[1], dtype={"Zipcode": str})
+    return df
 
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     # Suppression. On ne garde que les commentaires google reviews.
