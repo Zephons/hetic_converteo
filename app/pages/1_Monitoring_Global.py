@@ -19,6 +19,16 @@ min_date, max_date = df_dates.values[0]
 selected_min_date = st.sidebar.date_input("Date de début :", value=min_date, min_value=min_date, max_value=max_date)
 selected_max_date = st.sidebar.date_input("Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
 
+# Metric nombre d'avis.
+sql_metrics = f"""
+    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+"""
+df_metrics = pd.read_sql_query(sql_metrics, engine)
+sum_comments, aggregated_average_rating = df_metrics.values[0]
+metric_col1, metric_col2, metric_col3 = st.columns(3)
+metric_col1.metric("Nombre d'avis", sum_comments)
+metric_col2.metric("Note moyenne", aggregated_average_rating)
+
 # Pie chart Sentiment
 sql_pie_chart = f"""
     SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";

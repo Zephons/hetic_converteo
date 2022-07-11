@@ -19,6 +19,12 @@ df_city_address = df_enriched[["City", "Address Without Number", "Date"]].drop_d
 df_city_address.to_sql(name="city_address_date", con=engine, if_exists="replace")
 
 # Table pour le pie chart Sentiment.
-df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Sentiment", "Date"])["Sentiment"].count().reset_index(name="Count")
+df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Date", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie_chart_sentiment.to_sql(name="pie_chart_sentiment", con=engine, if_exists="replace")
 
+# Table pour les metriques : nombre d'avis, rating.
+groupby_filter = df_enriched.groupby(["City", "Address Without Number", "Date"])
+df_nb_comments = groupby_filter["Content"].count().reset_index(name="Number of Comments")
+df_rating = groupby_filter["Rating"].mean().round(2).reset_index(name="Average Rating")
+df_metrics = pd.concat([df_nb_comments, df_rating[["Average Rating"]]], axis=1)
+df_metrics.to_sql(name="metrics", con=engine, if_exists="replace")
