@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from datetime import datetime
+from datetime import date
 from sqlalchemy import create_engine
 
 
@@ -16,7 +16,8 @@ sql_city = """
     SELECT DISTINCT "City" FROM public.city_address_date;
 """
 df_city = pd.read_sql_query(sql_city, engine)
-selected_city = st.sidebar.selectbox("Ville :", df_city["City"])
+index_paris = int(df_city.index[df_city["City"] == "Paris"][0])
+selected_city = st.sidebar.selectbox("Ville :", df_city["City"], index_paris)
 
 # Sélectionner une adresse.
 sql_address = f"""
@@ -31,7 +32,7 @@ sql_dates = f"""
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
-default_date = datetime(2022, 1, 1)
+default_date = min(date(2022, 1, 1), max_date)
 selected_min_date = st.sidebar.date_input("Date de début :", value=default_date, min_value=min_date, max_value=max_date)
 selected_max_date = st.sidebar.date_input("Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
 
