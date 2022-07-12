@@ -6,10 +6,23 @@ from datetime import date
 from sqlalchemy import create_engine
 
 
-st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="centered", initial_sidebar_state="auto", menu_items=None)
-
 postgresql_uri = os.environ["DATABASE_URL"]
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
+
+st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.markdown("""
+<style>
+div[data-testid="metric-container"] {
+   background-color: rgba(28, 131, 225, 0.1);
+   border: 1px solid rgba(28, 131, 225, 0.1);
+   padding: 5% 5% 5% 10%;
+   border-radius: 5px;
+   color: rgb(30, 103, 119);
+   overflow-wrap: break-word;
+}
+</style>
+"""
+, unsafe_allow_html=True)
 
 # Sélectionner une ville.
 sql_city = """
@@ -67,12 +80,13 @@ fig_pie_chart_sentiment.update_layout(
     width=500,
     height=500,
     font={"size": 15},
+    title_x=0.5,
     showlegend=False)
 st.plotly_chart(fig_pie_chart_sentiment)
 
-st.sidebar.title("About")
+st.sidebar.title("À propos")
 st.sidebar.info(
 """
-    Code source : <https://github.com/Zephons/hetic_converteo>
+    Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
 """
 )
