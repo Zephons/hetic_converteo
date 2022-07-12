@@ -5,3 +5,9 @@ st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="cen
 
 st.header("Group 9")
 
+st.sidebar.title("About")
+st.sidebar.info(
+"""
+    Code source : <https://github.com/Zephons/hetic_converteo>
+"""
+)
