@@ -33,9 +33,23 @@ metric_col2.metric("Nombre de notes", sum_ratings)
 metric_col3.metric("Note moyenne", f"{aggregated_average_rating} / 5")
 
 # Pie chart Sentiment
-sql_pie_chart = f"""
+sql_pie_chart_sentiment = f"""
     SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
 """
-df_pie_chart = pd.read_sql_query(sql_pie_chart, engine)
-fig = px.pie(names=df_pie_chart["Sentiment"], values=df_pie_chart["Sum"])
-st.plotly_chart(fig)
+df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
+fig_pie_chart_sentiment = px.pie(
+    names=df_pie_chart_sentiment["Sentiment"],
+    values=df_pie_chart_sentiment["Sum"],
+    title='Sentiment des avis',
+    color=df_pie_chart_sentiment["Sentiment"],
+    color_discrete_map={
+        "Négatif": "#EF553B",
+        "Positif": "#00CC96",
+        "Neutre": "#636EFA"})
+fig_pie_chart_sentiment.update_traces(textinfo='percent+label')
+fig_pie_chart_sentiment.update_layout(
+    autosize=False,
+    width=500,
+    height=500,
+    showlegend=False)
+st.plotly_chart(fig_pie_chart_sentiment)

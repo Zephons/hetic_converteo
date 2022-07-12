@@ -52,5 +52,19 @@ sql_pie_chart_sentiment = f"""
     SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
 """
 df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
-fig_pie_chart_sentiment = px.pie(names=df_pie_chart_sentiment["Sentiment"], values=df_pie_chart_sentiment["Sum"])
+fig_pie_chart_sentiment = px.pie(
+    names=df_pie_chart_sentiment["Sentiment"],
+    values=df_pie_chart_sentiment["Sum"],
+    title='Sentiment des avis',
+    color=df_pie_chart_sentiment["Sentiment"],
+    color_discrete_map={
+        "Négatif": "#EF553B",
+        "Positif": "#00CC96",
+        "Neutre": "#636EFA"})
+fig_pie_chart_sentiment.update_traces(textinfo='percent+label')
+fig_pie_chart_sentiment.update_layout(
+    autosize=False,
+    width=500,
+    height=500,
+    showlegend=False)
 st.plotly_chart(fig_pie_chart_sentiment)

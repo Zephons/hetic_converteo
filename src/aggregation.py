@@ -2,15 +2,15 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 
-from process import load, preprocess, enrich
+from process import load_raw_data, preprocess, enrich
 
 
 postgresql_uri = os.environ["DATABASE_URL"]
 path_raw_data = os.path.join("data", "raw_datas_projet_M5D_Hetic.xlsx")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-df = load(path_raw_data)
-df_preprocessed = preprocess(df)
+df_raw_data = load_raw_data(path_raw_data)
+df_preprocessed = preprocess(df_raw_data)
 df_enriched = enrich(df_preprocessed)
 
 # Table pour les villes, les adresses et les dates.

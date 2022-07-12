@@ -9,10 +9,14 @@ from methods import assign_group_name
 postgresql_uri = os.environ["DATABASE_URL"]
 
 # TODO If this function is launched for the Streamlit interface, @st.cache must be used to decorate this function.
-def load(path: str) -> pd.DataFrame:
+def load_raw_data(path: str) -> pd.DataFrame:
     # On force le type de la colonne Zipcode en string.
-    df = pd.read_excel(path, header=[1], dtype={"Zipcode": str})
-    return df
+    df_raw_data = pd.read_excel(path, header=[1], dtype={"Zipcode": str})
+    return df_raw_data
+
+def load_shop_data(path: str) -> pd.DataFrame:
+    df_shop_data = pd.read_excel(path)
+    return df_shop_data
 
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     # Suppression. On ne garde que les commentaires google reviews.
@@ -30,7 +34,7 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 
 def enrich(df_preprocessed: pd.DataFrame) -> pd.DataFrame:
     # Feature engineering. On déduit les Sentiments à partir des Ratings.
-    df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Negative" if x<3 else ("Neutral" if x==3 else "Positive"))
+    df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Négatif" if x<3 else ("Neutre" if x==3 else "Positif"))
     # Feature engineering. On extrait la date à partir de la date de création.
     df_preprocessed["Date"] = df_preprocessed["Creation date"].dt.date
     return df_preprocessed
