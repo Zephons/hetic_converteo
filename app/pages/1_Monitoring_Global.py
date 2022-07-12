@@ -46,10 +46,11 @@ fig_pie_chart_sentiment = px.pie(
         "Négatif": "#EF553B",
         "Positif": "#00CC96",
         "Neutre": "#636EFA"})
-fig_pie_chart_sentiment.update_traces(textinfo='percent+label')
+fig_pie_chart_sentiment.update_traces(textinfo="percent+label")
 fig_pie_chart_sentiment.update_layout(
     autosize=False,
     width=500,
     height=500,
+    font={"size": 15},
     showlegend=False)
 st.plotly_chart(fig_pie_chart_sentiment)
