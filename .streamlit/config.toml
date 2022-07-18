@@ -1,7 +1,6 @@
 [server]
-headless = false
-enableCORS = true
-port = 8501
+headless = true
+enableCORS = false
 
 [theme]
 base = "dark"
