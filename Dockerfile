@@ -1,11 +1,14 @@
 FROM python:3.8
 
 RUN pip install pipenv
-WORKDIR /usr/src/hetic_converteo
-COPY Pipfile .
+
+ENV WORKDIR="/usr/project/hetic_converteo"
+WORKDIR $WORKDIR
+COPY Pipfile $WORKDIR/.
 RUN pipenv install
-COPY app ./
-COPY data ./
-COPY src ./
-COPY .streamlit ./
-ENTRYPOINT ["pipenv", "run", "streamlit", "run", "app/🏘️Home.py"]
+COPY app $WORKDIR/app
+COPY data $WORKDIR/data
+COPY src $WORKDIR/src
+COPY .streamlit $WORKDIR/.streamlit
+
+ENTRYPOINT ["pipenv", "run", "streamlit", "run", "$WORKDIR/app/🏘️Home.py"]
