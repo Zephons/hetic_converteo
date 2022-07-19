@@ -1,3 +1,5 @@
 build:
   docker:
     web: Dockerfile
+run:
+  web: pipenv run streamlit run $WORKDIR/app/🏘️Home.py
