@@ -10,3 +10,5 @@ COPY app $WORKDIR/app
 COPY data $WORKDIR/data
 COPY src $WORKDIR/src
 COPY .streamlit $WORKDIR/.streamlit
+
+ENTRYPOINT ["pipenv", "shell"]
