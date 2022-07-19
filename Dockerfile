@@ -11,4 +11,4 @@ COPY data $WORKDIR/data
 COPY src $WORKDIR/src
 COPY .streamlit $WORKDIR/.streamlit
 
-CMD ["pipenv", "run", "streamlit", "run", "$WORKDIR/app/🏘️Home.py"]
+ENTRYPOINT ["pipenv", "run", "streamlit", "run", "$WORKDIR/app/🏘️Home.py"]
