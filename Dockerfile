@@ -7,6 +7,7 @@ COPY app $WORKDIR/app
 COPY data $WORKDIR/data
 COPY src $WORKDIR/src
 COPY .streamlit $WORKDIR/.streamlit
+RUN echo "port = $PORT" >> $WORKDIR/.streamlit/config.toml
 RUN pip install pipenv && pipenv install --system
 
 ENTRYPOINT ["pipenv", "run", "streamlit", "run", "$WORKDIR/app/🏘️Home.py"]
