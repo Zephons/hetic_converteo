@@ -1,3 +1,4 @@
 build:
+  run: echo "port = $PORT" >> .streamlit/config.toml
   docker:
     web: Dockerfile
