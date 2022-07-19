@@ -8,5 +8,3 @@ COPY data $WORKDIR/data
 COPY src $WORKDIR/src
 COPY .streamlit $WORKDIR/.streamlit
 RUN pip install pipenv && pipenv install --system
-
-ENTRYPOINT ["pipenv", "run", "streamlit", "run", "$WORKDIR/app/🏘️Home.py"]
