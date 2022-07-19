@@ -4,7 +4,7 @@ RUN pip install pipenv
 
 ENV WORKDIR="/usr/project/hetic_converteo"
 WORKDIR $WORKDIR
-COPY Pipfile $WORKDIR/.
+COPY Pipfile $WORKDIR/Pipfile
 RUN pipenv install
 COPY app $WORKDIR/app
 COPY data $WORKDIR/data
