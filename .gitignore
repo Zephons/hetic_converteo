@@ -3,10 +3,10 @@
 *.csv
 *.xlsx
 *.json
-!departements-france.csv
-!sample.xlsx
-!
 \.idea
+# Exceptions
+!Magasin_casto.xlsx
+!correspondance-code-insee-code-postal.json
 
 # secretdir
 /secretdir/**/*.yml
