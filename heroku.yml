@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: pipenv run streamlit run $WORKDIR/app/🏘️Home.py --server.port $PORT
+  web: streamlit run $WORKDIR/app/🏘️Home.py --server.port $PORT
