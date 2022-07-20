@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: echo "port = $PORT" >> $WORKDIR/.streamlit/config.toml && pipenv run streamlit run $WORKDIR/app/🏘️Home.py"]
+  web: pipenv run streamlit run $WORKDIR/app/🏘️Home.py --server.port $PORT
