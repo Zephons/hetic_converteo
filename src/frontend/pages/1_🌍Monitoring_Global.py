@@ -5,8 +5,13 @@ import plotly.express as px
 from datetime import date
 from sqlalchemy import create_engine
 
+from src.backend.methods import get_file_setting, get_secrets
 
-postgresql_uri = os.environ["DATABASE_URL"]
+
+file_setting = get_file_setting("settings.yml")
+secrets = get_secrets(file_setting.get("SECRETS"))
+postgresql_uri = os.environ.get("DATABASE_URL") or secrets.get("POSTGRESQL").get("URI")
+mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCESS_TOKEN")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="centered", initial_sidebar_state="auto", menu_items=None)
@@ -19,6 +24,7 @@ div[data-testid="metric-container"] {
    border-radius: 5px;
    color: rgb(30, 103, 119);
    overflow-wrap: break-word;
+   font-size: 10px;
 }
 </style>
 """
@@ -31,8 +37,14 @@ sql_dates = f"""
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
 default_date = min(date(2022, 1, 1), max_date)
-selected_min_date = st.sidebar.date_input("Date de début :", value=default_date, min_value=min_date, max_value=max_date)
-selected_max_date = st.sidebar.date_input("Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
+selected_min_date = st.sidebar.date_input("📅 Date de début :", value=default_date, min_value=min_date, max_value=max_date)
+selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
+
+st.sidebar.title("À propos")
+st.sidebar.info("""
+    Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
+"""
+)
 
 # Metric nombre d'avis.
 sql_metrics = f"""
@@ -69,9 +81,8 @@ fig_pie_chart_sentiment.update_layout(
     showlegend=False)
 st.plotly_chart(fig_pie_chart_sentiment)
 
-st.sidebar.title("À propos")
-st.sidebar.info(
+# Carte géographique de Rating.
+sql_map_rating = f"""
+    SELECT "Zipcode", "Departement", "average_rating_departement" FROM public.map_rating WHERE "Creation date" >= '{selected_min_date}' AND "Creation date" <= '{selected_max_date}';
 """
-    Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
-"""
-)
+new_df_google = pd.read_sql_query(sql_map_rating, engine)

@@ -2,16 +2,18 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine
 
-from process import load_raw_data, preprocess, enrich
+from methods import get_file_setting, get_secrets
+from processing import preprocess, enrich
 
 
-postgresql_uri = os.environ["DATABASE_URL"]
-path_raw_data = os.path.join("data", "raw_datas_projet_M5D_Hetic.xlsx")
+file_setting = get_file_setting("settings.yml")
+path_raw_data = file_setting.get("RAW_DATA")
+secrets = get_secrets(file_setting.get("SECRETS"))
+postgresql_uri = os.environ.get("DATABASE_URL") or secrets.get("POSTGRESQL").get("URI")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-df_raw_data = load_raw_data(path_raw_data)
-df_preprocessed = preprocess(df_raw_data)
-df_enriched = enrich(df_preprocessed)
+df_preprocessed = preprocess(path_raw_data)
+df_enriched = enrich(df_preprocessed, file_setting)
 
 # Table pour les villes, les adresses et les dates.
 df_city_address = df_enriched[["City", "Address Without Number", "Date"]].drop_duplicates().sort_values(by=["City", "Address Without Number", "Date"], ignore_index=True)
@@ -29,3 +31,6 @@ df_rating = groupby_filter["Rating"].mean().round(2).reset_index(name="Average R
 df_metrics = pd.concat([df_nb_comments, df_nb_ratings[["Number of Ratings"]], df_rating[["Average Rating"]]], axis=1)
 df_metrics.to_sql(name="metrics", con=engine, if_exists="replace")
 
+# Table pour la carte
+df_map = pd.read_csv("data/dataframe_carte.csv")
+df_map.to_sql(name="map_rating", con=engine, if_exists="replace")
