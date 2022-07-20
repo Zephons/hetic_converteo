@@ -1,9 +1,11 @@
 import os
+import sys
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 from datetime import date
 from sqlalchemy import create_engine
+sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
 
