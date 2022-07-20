@@ -2,6 +2,7 @@
 *log
 *.csv
 *.xlsx
+*.json
 !departements-france.csv
 !sample.xlsx
 !
