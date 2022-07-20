@@ -22,13 +22,13 @@ def preprocess(path_raw_data: str) -> pd.DataFrame:
     return df_google
 
 def enrich(df_preprocessed: pd.DataFrame, file_setting: dict) -> pd.DataFrame:
-    path_geo_data = file_setting.get("GEO_DATA")
-    postal_geopoint = get_dict_postal_geopoint(path_geo_data)
-    df_preprocessed["Latitude"] = df_preprocessed["Zipcode"].apply(lambda x: [geo_point[1] for postal_code, geo_point in postal_geopoint.items() if x in postal_code][0])
-    df_preprocessed["Longitude"] = df_preprocessed["Zipcode"].apply(lambda x: [geo_point[0] for postal_code, geo_point in postal_geopoint.items() if x in postal_code][0])
     # Feature engineering. On déduit les Sentiments à partir des Ratings.
     df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Négatif" if x<3 else ("Neutre" if x==3 else "Positif"))
     # Feature engineering. On extrait la date à partir de la date de création.
     df_preprocessed["Date"] = df_preprocessed["Creation date"].dt.date
-    print(df_preprocessed)
+    # Feature engineering. On ajoute les coordonnées géographiques des villes.
+    path_geo_data = file_setting.get("GEO_DATA")
+    postal_geopoint = get_dict_postal_geopoint(path_geo_data)
+    df_preprocessed["Latitude"] = df_preprocessed["Zipcode"].apply(lambda x: [geo_point[1] for postal_code, geo_point in postal_geopoint.items() if x in postal_code][0])
+    df_preprocessed["Longitude"] = df_preprocessed["Zipcode"].apply(lambda x: [geo_point[0] for postal_code, geo_point in postal_geopoint.items() if x in postal_code][0])
     return df_preprocessed

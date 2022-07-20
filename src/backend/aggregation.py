@@ -23,14 +23,13 @@ df_city_address.to_sql(name="city_address_date", con=engine, if_exists="replace"
 df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Date", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie_chart_sentiment.to_sql(name="pie_chart_sentiment", con=engine, if_exists="replace")
 
-# Table pour les metriques : nombre d'avis, nombre de rating, rating moyen.
-groupby_filter = df_enriched.groupby(["City", "Address Without Number", "Date"])
+# Table pour les metriques et pour la carte : nombre d'avis, nombre de rating, rating moyen, latitude et longitude des villes.
+groupby_filter = df_enriched.groupby(["City", "Address Without Number", "Date", "Latitude", "Longitude"])
 df_nb_comments = groupby_filter["Content"].count().reset_index(name="Number of Comments")
 df_nb_ratings = groupby_filter["Rating"].count().reset_index(name="Number of Ratings")
 df_rating = groupby_filter["Rating"].mean().round(2).reset_index(name="Average Rating")
-df_metrics = pd.concat([df_nb_comments, df_nb_ratings[["Number of Ratings"]], df_rating[["Average Rating"]]], axis=1)
-df_metrics.to_sql(name="metrics", con=engine, if_exists="replace")
-
-# Table pour la carte
-df_map = pd.read_csv("data/dataframe_carte.csv")
-df_map.to_sql(name="map_rating", con=engine, if_exists="replace")
+df_metrics_map = pd.concat([df_nb_comments, df_nb_ratings[["Number of Ratings"]], df_rating[["Average Rating"]]], axis=1)
+# lower_tertile_point = df_map["Average Rating"].quantile(0.33)
+# upper_tertile_point = df_map["Average Rating"].quantile(0.66)
+# df_map["Rating Tertile"] = df_map["Average Rating"].apply(lambda x: f"Moins de {lower_tertile_point}" if x < lower_tertile_point else (f"Plus de {upper_tertile_point}" if x > upper_tertile_point else f"Entre {lower_tertile_point} et {upper_tertile_point}"))
+df_metrics_map.to_sql(name="metrics_map", con=engine, if_exists="replace")

@@ -1,7 +1,7 @@
-[theme]
-base = "light"
-primaryColor = "purple"
-
 [server]
 headless = true
 enableCORS = true
+
+[theme]
+base = "light"
+primaryColor = "purple"

@@ -1,11 +1,12 @@
 import os
 import sys
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import plotly.express as px
 from datetime import date
 from sqlalchemy import create_engine
-sys.path.append(os.getcwd())
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
 
@@ -50,7 +51,7 @@ st.sidebar.info("""
 
 # Metric nombre d'avis.
 sql_metrics = f"""
-    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
 """
 df_metrics = pd.read_sql_query(sql_metrics, engine)
 sum_comments, sum_ratings, aggregated_average_rating = df_metrics.values[0]
@@ -84,7 +85,24 @@ fig_pie_chart_sentiment.update_layout(
 st.plotly_chart(fig_pie_chart_sentiment)
 
 # Carte géographique de Rating.
-sql_map_rating = f"""
-    SELECT "Zipcode", "Departement", "average_rating_departement" FROM public.map_rating WHERE "Creation date" >= '{selected_min_date}' AND "Creation date" <= '{selected_max_date}';
+sql_map = f"""
+    SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
 """
-new_df_google = pd.read_sql_query(sql_map_rating, engine)
+df_map = pd.read_sql_query(sql_map, engine)
+px.set_mapbox_access_token("pk.eyJ1IjoidHplcGhvbnMiLCJhIjoiY2w1cXcwbHBtMjFrMTNwcGE5OTB3bGE0NCJ9.e5LRf5icKvgz-UkD4055fQ")
+fig_map = px.scatter_mapbox(
+    df_map,
+    lat="Latitude",
+    lon="Longitude",
+    color="Average Rating",
+    hover_name="City",
+    hover_data=["Number of Ratings", "Average Rating"],
+    size="Number of Ratings",
+    color_continuous_scale=px.colors.diverging.RdYlGn,
+    opacity=0.8,
+    size_max=30,
+    mapbox_style="basic",
+    zoom=5,
+    width=950,
+    height=750)
+st.plotly_chart(fig_map)

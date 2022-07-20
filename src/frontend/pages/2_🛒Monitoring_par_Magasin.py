@@ -5,7 +5,8 @@ import streamlit as st
 import plotly.express as px
 from datetime import date
 from sqlalchemy import create_engine
-sys.path.append(os.getcwd())
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
 
@@ -55,9 +56,15 @@ default_date = min(date(2022, 1, 1), max_date)
 selected_min_date = st.sidebar.date_input("📅 Date de début :", value=default_date, min_value=min_date, max_value=max_date)
 selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
 
+st.sidebar.title("À propos")
+st.sidebar.info("""
+    Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
+"""
+)
+
 # Metric nombre d'avis.
 sql_metrics = f"""
-    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+    SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
 """
 df_metrics = pd.read_sql_query(sql_metrics, engine)
 sum_comments, sum_ratings, aggregated_average_rating = df_metrics.values[0]
@@ -90,9 +97,3 @@ fig_pie_chart_sentiment.update_layout(
     title_x=0.5,
     showlegend=False)
 st.plotly_chart(fig_pie_chart_sentiment)
-
-st.sidebar.title("À propos")
-st.sidebar.info("""
-    Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
-"""
-)
