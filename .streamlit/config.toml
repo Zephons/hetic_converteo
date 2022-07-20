@@ -4,4 +4,4 @@ primaryColor = "purple"
 
 [server]
 headless = true
-enableCORS = false
+enableCORS = true
