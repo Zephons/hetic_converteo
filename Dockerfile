@@ -2,7 +2,7 @@ FROM python:3.8-slim-buster
 LABEL maintainer="HETIC"
 ENV WORKDIR="/usr/project/hetic_converteo"
 WORKDIR $WORKDIR
-COPY Pipfile Pipfile.lock $WORKDIR/
+COPY Pipfile Pipfile.lock settings.yml $WORKDIR/
 COPY src $WORKDIR/src
 COPY .streamlit $WORKDIR/.streamlit
 RUN pip install pipenv && pipenv install --system
