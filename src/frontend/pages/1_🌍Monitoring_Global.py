@@ -22,7 +22,7 @@ set_markdown()
 
 # Sélectionner les dates de début et de fin.
 sql_dates = f"""
-    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.city_address_date;
+    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters;
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]

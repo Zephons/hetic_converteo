@@ -6,5 +6,5 @@ FILE:
   SRC:
     DATA:
       RAW_DATA: raw_datas_projet_M5D_Hetic.xlsx
-      SHOP_DATA: Magain_casto.xlsx
+      SHOP_DATA: Magasin_casto.xlsx
       GEO_DATA: correspondance-code-insee-code-postal.json

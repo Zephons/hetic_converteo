@@ -21,7 +21,7 @@ set_markdown()
 
 # Sélectionner une ville.
 sql_city = """
-    SELECT DISTINCT "City" FROM public.city_address_date;
+    SELECT DISTINCT "City" FROM public.filters;
 """
 df_city = pd.read_sql_query(sql_city, engine)
 index_paris = int(df_city.index[df_city["City"] == "Paris"][0])
@@ -29,14 +29,14 @@ selected_city = st.sidebar.selectbox("🏙️ Ville :", df_city["City"], index_p
 
 # Sélectionner une adresse.
 sql_address = f"""
-    SELECT DISTINCT "Address Without Number" FROM public.city_address_date WHERE "City" = $${selected_city}$$;
+    SELECT DISTINCT "Address Without Number" FROM public.filters WHERE "City" = $${selected_city}$$;
 """
 df_address = pd.read_sql_query(sql_address, engine)
 selected_address = st.sidebar.selectbox("📍 Adresse :", df_address["Address Without Number"])
 
 # Sélectionner les dates de début et de fin.
 sql_dates = f"""
-    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.city_address_date WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
+    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]

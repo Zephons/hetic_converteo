@@ -12,19 +12,19 @@ secrets = get_secrets(file_setting.get("SECRETS"))
 postgresql_uri = os.environ.get("DATABASE_URL") or secrets.get("POSTGRESQL").get("URI")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-df_preprocessed = preprocess(path_raw_data)
-df_enriched = enrich(df_preprocessed, file_setting)
+df_preprocessed, df_city_matched = preprocess(file_setting)
+df_enriched = enrich(df_preprocessed, df_city_matched, file_setting)
 
-# Table pour les villes, les adresses et les dates.
+# Create SQL Table for the filters (city, address and date).
 df_city_address = df_enriched[["City", "Address Without Number", "Date"]].drop_duplicates().sort_values(by=["City", "Address Without Number", "Date"], ignore_index=True)
-df_city_address.to_sql(name="city_address_date", con=engine, if_exists="replace")
+df_city_address.to_sql(name="filters", con=engine, if_exists="replace")
 
-# Table pour le pie chart Sentiment.
+# Create SQL Table for the pie chart Sentiment.
 df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Date", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie_chart_sentiment.to_sql(name="pie_chart_sentiment", con=engine, if_exists="replace")
 
-# Table pour les metriques et pour la carte : nombre d'avis, nombre de rating, rating moyen, latitude et longitude des villes.
-groupby_filter = df_enriched.groupby(["City", "Address Without Number", "Date", "Latitude", "Longitude"])
+# Create SQL Table for the KPIs and the map: number of comments, number of ratings, average rating, latitude and longitude of the cities.
+groupby_filter = df_enriched.groupby(["City", "Address Without Number", "Is Open", "Date", "Latitude", "Longitude"])
 df_nb_comments = groupby_filter["Content"].count().reset_index(name="Number of Comments")
 df_nb_ratings = groupby_filter["Rating"].count().reset_index(name="Number of Ratings")
 df_rating = groupby_filter["Rating"].mean().round(2).reset_index(name="Average Rating")

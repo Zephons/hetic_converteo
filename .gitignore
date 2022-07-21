@@ -5,7 +5,7 @@
 *.json
 \.idea
 # Exceptions
-!Magasin_casto.xlsx
+!magasin_casto.xlsx
 
 # secretdir
 /secretdir/**/*.yml
