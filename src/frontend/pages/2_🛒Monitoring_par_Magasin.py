@@ -9,7 +9,7 @@ if os.getcwd() not in sys.path:
 
 from src.backend.methods import get_file_setting, get_secrets
 from src.frontend.charts.charts_par_magasin import get_metrics_par_magasin, get_pie_chart_sentiment_par_magasin
-from src.frontend.charts.widgets_in_common import set_markdown, set_about
+from src.frontend.charts.widgets_in_common import set_markdown_par_magasin, set_about
 
 
 file_setting = get_file_setting("settings.yml")
@@ -17,7 +17,7 @@ secrets = get_secrets(file_setting.get("SECRETS"))
 postgresql_uri = os.environ.get("DATABASE_URL") or secrets.get("POSTGRESQL").get("URI")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-set_markdown()
+set_markdown_par_magasin()
 
 # Select a city.
 sql_city = """

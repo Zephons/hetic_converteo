@@ -11,7 +11,7 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
         SELECT "Is Open" FROM public.shop_info;
     """
     sql_metrics = f"""
-        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics = pd.read_sql_query(sql_metrics, engine)

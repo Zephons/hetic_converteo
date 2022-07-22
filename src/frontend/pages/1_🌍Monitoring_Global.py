@@ -9,7 +9,7 @@ if os.getcwd() not in sys.path:
 
 from src.backend.methods import get_file_setting, get_secrets
 from src.frontend.charts.charts_global import get_metrics_global, get_pie_chart_sentiment_global, get_map_global
-from src.frontend.charts.widgets_in_common import set_markdown, set_about
+from src.frontend.charts.widgets_in_common import set_markdown_global, set_about
 
 
 file_setting = get_file_setting("settings.yml")
@@ -18,7 +18,7 @@ postgresql_uri = os.environ.get("DATABASE_URL") or secrets.get("POSTGRESQL").get
 mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCESS_TOKEN")
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
-set_markdown()
+set_markdown_global()
 
 # Select a start date and an end date.
 sql_dates = f"""
@@ -35,12 +35,13 @@ set_about()
 selected_chart_type = st.selectbox("Type de graphique :", ["KPIs", "Carte géographique"])
 if selected_chart_type == "KPIs":
     # Shop info and KPIs (number of comments, number of ratings, average rating).
-    nb_shops_in_operation, nb_shops, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
-    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    nb_shops_in_operation, nb_shops, sum_comments, sum_ratings, sum_comments_per_shop, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
+    metric_col1, metric_col2, metric_col3, metric_col4, metric_col5 = st.columns(5)
     metric_col1.metric("Nombre de magasins en activité", f"{nb_shops_in_operation} / {nb_shops}")
     metric_col2.metric("Nombre d'avis", sum_comments)
     metric_col3.metric("Nombre de notes", sum_ratings)
-    metric_col4.metric("Note moyenne", f"{aggregated_average_rating} / 5")
+    metric_col4.metric("Nombre d'avis par magasin", sum_comments_per_shop)
+    metric_col5.metric("Note moyenne", f"{aggregated_average_rating} / 5")
 
     # Pie chart Sentiment.
     pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
