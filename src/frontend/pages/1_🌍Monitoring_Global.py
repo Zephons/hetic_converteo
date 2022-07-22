@@ -20,7 +20,7 @@ engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 set_markdown()
 
-# Sélectionner les dates de début et de fin.
+# Select a start date and an end date.
 sql_dates = f"""
     SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters;
 """
@@ -34,7 +34,7 @@ set_about()
 
 selected_chart_type = st.selectbox("Type de graphique :", ["KPIs", "Carte géographique"])
 if selected_chart_type == "KPIs":
-    # Métriques sur nombre d'avis, nombre de rating, rating moyen.
+    # Shop info and KPIs (number of comments, number of ratings, average rating).
     nb_shops_in_operation, nb_shops, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
     metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
     metric_col1.metric("Nombre de magasins en activité", f"{nb_shops_in_operation} / {nb_shops}")
@@ -46,6 +46,6 @@ if selected_chart_type == "KPIs":
     pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
     st.plotly_chart(pie_chart_sentiment_global)
 else:
-    # Carte géographique de Rating.
+    # Geographical Map with regards to rating.
     map_global = get_map_global(engine, selected_min_date, selected_max_date)
     st.plotly_chart(map_global)

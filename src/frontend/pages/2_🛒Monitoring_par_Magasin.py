@@ -19,7 +19,7 @@ engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 set_markdown()
 
-# Sélectionner une ville.
+# Select a city.
 sql_city = """
     SELECT DISTINCT "City" FROM public.filters;
 """
@@ -27,14 +27,14 @@ df_city = pd.read_sql_query(sql_city, engine)
 index_paris = int(df_city.index[df_city["City"] == "Paris"][0])
 selected_city = st.sidebar.selectbox("🏙️ Ville :", df_city["City"], index_paris)
 
-# Sélectionner une adresse.
+# Select an address.
 sql_address = f"""
     SELECT DISTINCT "Address Without Number" FROM public.filters WHERE "City" = $${selected_city}$$;
 """
 df_address = pd.read_sql_query(sql_address, engine)
 selected_address = st.sidebar.selectbox("📍 Adresse :", df_address["Address Without Number"])
 
-# Sélectionner les dates de début et de fin.
+# Select a start date and an end date.
 sql_dates = f"""
     SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
 """
@@ -48,7 +48,7 @@ set_about()
 
 selected_chart_type = st.selectbox("Type de graphique :", ["KPIs", "Traitement automatique du langage naturel"])
 if selected_chart_type == "KPIs":
-    # Métriques sur nombre d'avis, nombre de rating, rating moyen.
+    # Shop info and KPIs (number of comments, number of ratings, average rating).
     group_name, is_open, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
     status = "En activité" if is_open else "Fermé"
     average_rating = f"{aggregated_average_rating} / 5" if aggregated_average_rating else "—"
