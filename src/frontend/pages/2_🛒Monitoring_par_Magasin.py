@@ -54,7 +54,7 @@ if selected_chart_type == "KPIs":
     average_rating = f"{aggregated_average_rating} / 5" if aggregated_average_rating else "—"
     metric_col1, metric_col2, metric_col3, metric_col4, metric_col5 = st.columns(5)
     metric_col1.metric("Statut", status)
-    metric_col2.metric("Groupe", group_name)
+    metric_col2.metric("Région", group_name)
     metric_col3.metric("Nombre d'avis", sum_comments)
     metric_col4.metric("Nombre de notes", sum_ratings)
     metric_col5.metric("Note moyenne", average_rating)

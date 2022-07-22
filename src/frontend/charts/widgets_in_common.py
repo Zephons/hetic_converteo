@@ -16,7 +16,7 @@ def set_markdown_global():
     div[data-testid="metric-container"] {
         background-color: rgba(28, 131, 225, 0.1);
         border: 1px solid rgba(28, 131, 225, 0.1);
-        padding: 2% 2% 2% 10%;
+        padding: 2% 2% 2% 5%;
         border-radius: 5px;
         color: rgb(30, 103, 119);
         overflow-wrap: break-word;
