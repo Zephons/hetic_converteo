@@ -19,6 +19,8 @@ def preprocess(file_setting: dict) -> pd.DataFrame:
     # Keep only certains columns that are useful.
     cols_to_keep = ["Creation date", "Business Id", "Group name", "Address", "City", "Zipcode", "Content", "Response", "Rating"]
     df_google = df_google[cols_to_keep]
+    # Convert group name to title case.
+    df_google["Group Name"] = df_google["Group name"].str.title()
     # Remove tabs from city names.
     df_google["City"] = df_google["City"].str.strip()
     # Unify addresses (without street number).

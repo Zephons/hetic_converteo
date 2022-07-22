@@ -7,11 +7,17 @@ from sqlalchemy import engine
 
 
 def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> np.ndarray:
+    sql_shop_info = f"""
+        SELECT "Is Open" FROM public.shop_info;
+    """
     sql_metrics = f"""
         SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
     """
+    df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics = pd.read_sql_query(sql_metrics, engine)
-    metrics_global = df_metrics.values[0]
+    nb_shops_in_operation = sum(df_shop_info["Is Open"])
+    nb_shops = len(df_shop_info)
+    metrics_global = np.append((nb_shops_in_operation, nb_shops), df_metrics.values[0])
     return metrics_global
 
 def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -40,7 +46,7 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
 
 def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_map = f"""
-    SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
+        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
     """
     df_map = pd.read_sql_query(sql_map, engine)
     px.set_mapbox_access_token("pk.eyJ1IjoidHplcGhvbnMiLCJhIjoiY2w1cXcwbHBtMjFrMTNwcGE5OTB3bGE0NCJ9.e5LRf5icKvgz-UkD4055fQ")

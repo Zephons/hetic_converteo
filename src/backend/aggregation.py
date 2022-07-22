@@ -19,6 +19,10 @@ df_enriched = enrich(df_preprocessed, df_city_matched, file_setting)
 df_city_address = df_enriched[["City", "Address Without Number", "Date"]].drop_duplicates().sort_values(by=["City", "Address Without Number", "Date"], ignore_index=True)
 df_city_address.to_sql(name="filters", con=engine, if_exists="replace")
 
+# Create SQL Table for the informations of the shops.
+df_shop_info = df_enriched[["City", "Address Without Number", "Group Name", "Is Open"]].drop_duplicates().sort_values(by=["City", "Address Without Number"], ignore_index=True)
+df_shop_info.to_sql(name="shop_info", con=engine, if_exists="replace")
+
 # Create SQL Table for the pie chart Sentiment.
 df_pie_chart_sentiment = df_enriched.groupby(["City", "Address Without Number", "Date", "Sentiment"])["Sentiment"].count().reset_index(name="Count")
 df_pie_chart_sentiment.to_sql(name="pie_chart_sentiment", con=engine, if_exists="replace")

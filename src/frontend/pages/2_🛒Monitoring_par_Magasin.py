@@ -49,12 +49,15 @@ set_about()
 selected_chart_type = st.selectbox("Type de graphique :", ["KPIs", "Traitement automatique du langage naturel"])
 if selected_chart_type == "KPIs":
     # Métriques sur nombre d'avis, nombre de rating, rating moyen.
-    sum_comments, sum_ratings, aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
+    group_name, is_open, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
+    status = "En activité" if is_open else "Fermé"
     average_rating = f"{aggregated_average_rating} / 5" if aggregated_average_rating else "—"
-    metric_col1, metric_col2, metric_col3 = st.columns(3)
-    metric_col1.metric("Nombre d'avis", sum_comments)
-    metric_col2.metric("Nombre de notes", sum_ratings)
-    metric_col3.metric("Note moyenne", average_rating)
+    metric_col1, metric_col2, metric_col3, metric_col4, metric_col5 = st.columns(5)
+    metric_col1.metric("Statut", status)
+    metric_col2.metric("Groupe", group_name)
+    metric_col3.metric("Nombre d'avis", sum_comments)
+    metric_col4.metric("Nombre de notes", sum_ratings)
+    metric_col5.metric("Note moyenne", average_rating)
 
     # Pie chart Sentiment.
     pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)

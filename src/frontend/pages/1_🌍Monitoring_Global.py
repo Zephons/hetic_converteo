@@ -35,11 +35,12 @@ set_about()
 selected_chart_type = st.selectbox("Type de graphique :", ["KPIs", "Carte géographique"])
 if selected_chart_type == "KPIs":
     # Métriques sur nombre d'avis, nombre de rating, rating moyen.
-    sum_comments, sum_ratings, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
-    metric_col1, metric_col2, metric_col3 = st.columns(3)
-    metric_col1.metric("Nombre d'avis", sum_comments)
-    metric_col2.metric("Nombre de notes", sum_ratings)
-    metric_col3.metric("Note moyenne", f"{aggregated_average_rating} / 5")
+    nb_shops_in_operation, nb_shops, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    metric_col1.metric("Nombre de magasins en activité", f"{nb_shops_in_operation} / {nb_shops}")
+    metric_col2.metric("Nombre d'avis", sum_comments)
+    metric_col3.metric("Nombre de notes", sum_ratings)
+    metric_col4.metric("Note moyenne", f"{aggregated_average_rating} / 5")
 
     # Pie chart Sentiment.
     pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)

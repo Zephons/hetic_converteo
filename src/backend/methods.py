@@ -7,6 +7,7 @@ from yaml import safe_load
 
 
 def get_file_setting(path: str) -> dict:
+    # A helper math to transform files marked in settings.yml to a list of paths.
     with open(path) as stream:
         settings = safe_load(stream)
         file_info = settings.get('FILE')
@@ -24,23 +25,9 @@ def get_file_setting(path: str) -> dict:
         return file_setting
 
 def _flatten_dict(node_dict: dict, node_list: List = []) -> Generator[List[str], None, None]:
-        """A helper method to flatten a nested dictionary to a nested list
-
-        Parameters
-        ----------
-        node_dict : dict
-            dictionary that contains all the file nodes
-        node_list : List, optional
-            list that contains file nodes
-
-        Yields
-        -------
-        Generator[List[str], None, None]
-            A generator that is a nested list which contains all the file paths
-        """
-        # Flatten a nested dictionary to a list of lists.
-        for key, value in node_dict.items():
-            yield from ([ node_list + [key, value]] if not isinstance(value, dict) else _flatten_dict(value, node_list + [key]))
+    # Flatten a nested dictionary to a list of lists.
+    for key, value in node_dict.items():
+        yield from ([ node_list + [key, value]] if not isinstance(value, dict) else _flatten_dict(value, node_list + [key]))
 
 def get_secrets(path: str) -> dict:
     if os.path.exists(path):
