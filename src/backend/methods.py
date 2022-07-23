@@ -46,6 +46,10 @@ def load_shop_data(path: str) -> pd.DataFrame:
     df_shop_data = pd.read_excel(path)
     return df_shop_data
 
+def load_nlp_data(path: str) -> pd.DataFrame:
+    df_nmf = pd.read_csv(path)
+    return df_nmf
+
 def get_dict_postal_geopoint(path: str) -> Dict[str, List[float]]:
     with open(path) as stream:
         json_insee_postal = json.load(stream)

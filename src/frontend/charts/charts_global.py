@@ -22,7 +22,7 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
 
 def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""
-        SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.pie_chart_sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
+        SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_global = px.pie(
@@ -43,6 +43,30 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
         title_x=0.5,
         showlegend=False)
     return pie_chart_sentiment_global
+
+def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_bar_chart_group = f"""
+        SELECT "Group Name", "Sentiment", SUM("Count") AS "Sum" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Group Name", "Sentiment" ORDER BY "Sentiment", "Sum";
+    """
+    df_bar_chart_group_global = pd.read_sql_query(sql_bar_chart_group, engine)
+    bar_chart_group_global = px.bar(
+        data_frame=df_bar_chart_group_global,
+        x="Group Name",
+        y="Sum",
+        color="Sentiment",
+        color_discrete_map={
+            "Négatif": "#EF553B",
+            "Positif": "#00CC96",
+            "Neutre": "#636EFA"})
+    return bar_chart_group_global
+
+def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_line_chart_rating = f"""
+        SELECT "Date", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Date" ORDER BY "Date";
+    """
+    df_line_chart_rating_global = pd.read_sql_query(sql_line_chart_rating, engine)
+    line_chart_rating_global = px.line(df_line_chart_rating_global, x="Date", y="Aggregated Average Rating")
+    return line_chart_rating_global
 
 def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_map = f"""

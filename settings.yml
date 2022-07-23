@@ -8,3 +8,5 @@ FILE:
       RAW_DATA: raw_datas_projet_M5D_Hetic.xlsx
       SHOP_DATA: magasin_casto.xlsx
       GEO_DATA: correspondance-code-insee-code-postal.json
+      NMF_BAD_DATA: nmf_bad_reviews.csv
+      NMF_GOOD_DATA: nmf_good_reviews.csv

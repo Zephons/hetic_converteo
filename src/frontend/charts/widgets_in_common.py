@@ -25,7 +25,7 @@ def set_markdown_global():
         font-size: 16px;
     }
     div[data-testid="stMetricValue"] > div {
-        font-size: 25px;
+        font-size: 23px;
     }
     </style>
     """
@@ -47,7 +47,7 @@ def set_markdown_par_magasin():
         font-size: 16px;
     }
     div[data-testid="stMetricValue"] > div {
-        font-size: 25px;
+        font-size: 23px;
     }
     </style>
     """
