@@ -62,7 +62,9 @@ def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: da
     bar_chart_group_global.update_layout(
         font={"size": 15},
         title_x=0.5,
-        xaxis_title=None)
+        xaxis_title=None,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)')
     return bar_chart_group_global
 
 def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -78,7 +80,9 @@ def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: 
     line_chart_rating_global.update_layout(
         font={"size": 15},
         title_x=0.5,
-        xaxis_title=None)
+        xaxis_title=None,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)')
     return line_chart_rating_global
 
 def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
