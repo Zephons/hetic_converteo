@@ -45,14 +45,14 @@ metric_row2_col1, metric_row2_col2 = st.columns(2)
 # Pie chart Sentiment.
 pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_global)
-
-metric_row3_col1, metric_row3_col2 = st.columns(2)
 # Bar chart Group.
 bar_chart_group_global = get_bar_chart_group_global(engine, selected_min_date, selected_max_date)
-metric_row3_col1.plotly_chart(bar_chart_group_global)
+metric_row2_col2.plotly_chart(bar_chart_group_global)
+
+metric_row3_col1, metric_row3_col2 = st.columns(2)
 # Line chart Rating.
 line_chart_rating_global = get_line_chart_rating_global(engine, selected_min_date, selected_max_date)
-metric_row3_col2.plotly_chart(line_chart_rating_global)
+metric_row3_col1.plotly_chart(line_chart_rating_global)
 
 # Geographical Map with regards to rating.
 map_global = get_map_global(engine, selected_min_date, selected_max_date)
