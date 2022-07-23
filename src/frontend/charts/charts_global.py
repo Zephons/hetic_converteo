@@ -46,18 +46,23 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
 
 def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_group = f"""
-        SELECT "Group Name", "Sentiment", SUM("Count") AS "Sum" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Group Name", "Sentiment" ORDER BY "Sentiment", "Sum";
+        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
     """
     df_bar_chart_group_global = pd.read_sql_query(sql_bar_chart_group, engine)
     bar_chart_group_global = px.bar(
         data_frame=df_bar_chart_group_global,
-        x="Group Name",
-        y="Sum",
+        x="Group",
+        y="Nombre de notes",
+        title='Sentiment sur les régions',
         color="Sentiment",
         color_discrete_map={
             "Négatif": "#EF553B",
             "Positif": "#00CC96",
             "Neutre": "#636EFA"})
+    bar_chart_group_global.update_layout(
+        font={"size": 15},
+        title_x=0.5,
+        xaxis_title=None)
     return bar_chart_group_global
 
 def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -65,7 +70,15 @@ def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: 
         SELECT "Date", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Date" ORDER BY "Date";
     """
     df_line_chart_rating_global = pd.read_sql_query(sql_line_chart_rating, engine)
-    line_chart_rating_global = px.line(df_line_chart_rating_global, x="Date", y="Aggregated Average Rating")
+    line_chart_rating_global = px.line(
+        data_frame=df_line_chart_rating_global,
+        x="Date",
+        y="Aggregated Average Rating",
+        title='Évolution des notes')
+    line_chart_rating_global.update_layout(
+        font={"size": 15},
+        title_x=0.5,
+        xaxis_title=None)
     return line_chart_rating_global
 
 def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -79,6 +92,7 @@ def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected
         lat="Latitude",
         lon="Longitude",
         color="Average Rating",
+        title="Carte géographique sur les notes",
         hover_name="City",
         hover_data=["Number of Ratings", "Average Rating"],
         size="Number of Ratings",
@@ -89,4 +103,7 @@ def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected
         zoom=5.1,
         width=1300,
         height=800)
+    map_global.update_layout(
+        font={"size": 17},
+        title_x=0.5)
     return map_global

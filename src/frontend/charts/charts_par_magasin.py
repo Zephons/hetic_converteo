@@ -43,39 +43,6 @@ def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_cit
         showlegend=False)
     return pie_chart_sentiment_par_magasin
 
-def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
-    sql_bar_chart_bad_topics = f"""
-        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
-    """
-    df_bar_chart_bad_topics = pd.read_sql_query(sql_bar_chart_bad_topics, engine)
-    bar_chart_bad_topics = go.Figure()
-    bar_chart_bad_topics.add_trace(go.Bar(
-        y=df_bar_chart_bad_topics["main_word"],
-        x=df_bar_chart_bad_topics["Sum"],
-        name='Négatif',
-        orientation='h',
-        marker=dict(
-           color='rgba(122, 120, 168, 0.8)',
-           line=dict(color='rgba(122, 120, 168, 0.8)', width=2)
-        )
-    ))
-    bar_chart_bad_topics.update_layout(
-        barmode='stack',
-        title_text="Sujets négatifs principaux",
-        xaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        yaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=120, r=10, t=140, b=80))
-    bar_chart_bad_topics.update_xaxes(categoryorder='total ascending')
-    return bar_chart_bad_topics
-
 def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_good_topics = f"""
         SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
@@ -94,6 +61,8 @@ def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_c
     ))
     bar_chart_good_topics.update_layout(
         barmode='stack',
+        font={"size": 15},
+        title_x=0.5,
         title_text="Sujets positifs principaux",
         xaxis=dict(
             showgrid=False,
@@ -108,3 +77,38 @@ def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_c
         margin=dict(l=120, r=10, t=140, b=80))
     bar_chart_good_topics.update_xaxes(categoryorder='total ascending')
     return bar_chart_good_topics
+
+def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_bar_chart_bad_topics = f"""
+        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
+    """
+    df_bar_chart_bad_topics = pd.read_sql_query(sql_bar_chart_bad_topics, engine)
+    bar_chart_bad_topics = go.Figure()
+    bar_chart_bad_topics.add_trace(go.Bar(
+        y=df_bar_chart_bad_topics["main_word"],
+        x=df_bar_chart_bad_topics["Sum"],
+        name='Négatif',
+        orientation='h',
+        marker=dict(
+           color='rgba(122, 120, 168, 0.8)',
+           line=dict(color='rgba(122, 120, 168, 0.8)', width=2)
+        )
+    ))
+    bar_chart_bad_topics.update_layout(
+        barmode='stack',
+        font={"size": 15},
+        title_x=0.5,
+        title_text="Sujets négatifs principaux",
+        xaxis=dict(
+            showgrid=False,
+            showline=False
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showline=False
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=120, r=10, t=140, b=80))
+    bar_chart_bad_topics.update_xaxes(categoryorder='total ascending')
+    return bar_chart_bad_topics
