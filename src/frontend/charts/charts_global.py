@@ -26,22 +26,22 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_global = px.pie(
-        names=df_pie_chart_sentiment["Sentiment"],
-        values=df_pie_chart_sentiment["Sum"],
+        data_frame=df_pie_chart_sentiment,
+        names="Sentiment",
+        values="Sum",
         title='Sentiment des avis',
-        color=df_pie_chart_sentiment["Sentiment"],
+        category_orders={"Sentiment": ["Négatif", "Neutre", "Positif"]},
+        color="Sentiment",
         color_discrete_map={
             "Négatif": "#EF553B",
             "Positif": "#00CC96",
             "Neutre": "#636EFA"})
-    pie_chart_sentiment_global.update_traces(textinfo="percent+label")
     pie_chart_sentiment_global.update_layout(
         autosize=False,
-        width=400,
-        height=400,
+        width=450,
+        height=450,
         font={"size": 15},
-        title_x=0.5,
-        showlegend=False)
+        title_x=0.5)
     return pie_chart_sentiment_global
 
 def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
