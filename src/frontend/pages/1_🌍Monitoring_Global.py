@@ -8,7 +8,7 @@ if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
-from src.frontend.charts.charts_global import get_metrics_global, get_pie_chart_sentiment_global, get_bar_chart_group_global, get_line_chart_rating_global, get_map_global
+from src.frontend.charts.charts_global import get_metrics_global, get_pie_chart_sentiment_global, get_bar_chart_group_global, get_map_global, get_bar_chart_good_topics_global, get_bar_chart_bad_topics_global
 from src.frontend.charts.widgets_in_common import set_markdown_global, set_about
 
 
@@ -19,6 +19,8 @@ mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCE
 engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 set_markdown_global()
+
+st.sidebar.image("src/images/Castorama-logo.png")
 
 # Select a start date and an end date.
 sql_dates = f"""
@@ -33,27 +35,49 @@ selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, 
 set_about()
 
 # Shop info and KPIs (number of comments, number of ratings, average rating).
+st.title("KPIs")
 nb_shops_in_operation, nb_shops, sum_comments, sum_ratings, sum_comments_per_shop, aggregated_average_rating = get_metrics_global(engine, selected_min_date, selected_max_date)
-metric_row1_col1, metric_row1_col2, metric_row1_col3, metric_row1_col4, metric_row1_col5 = st.columns(5)
+metric_row1_col1, metric_row1_col2, metric_row1_col3, metric_row1_col4, metric_row1_col5 = st.columns((1, 1, 1, 1, 1))
 metric_row1_col1.metric("Nombre de magasins en activité", f"{nb_shops_in_operation} / {nb_shops}")
 metric_row1_col2.metric("Nombre d'avis", sum_comments)
 metric_row1_col3.metric("Nombre de notes", sum_ratings)
 metric_row1_col4.metric("Nombre d'avis par magasin", sum_comments_per_shop)
 metric_row1_col5.metric("Note moyenne", f"{aggregated_average_rating} / 5")
 
-metric_row2_col1, metric_row2_col2 = st.columns(2)
-# Pie chart Sentiment.
-pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
-metric_row2_col1.plotly_chart(pie_chart_sentiment_global)
-# Bar chart Group.
-bar_chart_group_global = get_bar_chart_group_global(engine, selected_min_date, selected_max_date)
-metric_row2_col2.plotly_chart(bar_chart_group_global)
-
-metric_row3_col1, metric_row3_col2 = st.columns(2)
-# Line chart Rating.
-line_chart_rating_global = get_line_chart_rating_global(engine, selected_min_date, selected_max_date)
-metric_row3_col1.plotly_chart(line_chart_rating_global)
+# Disable Plotly toolbar
+config = {'displayModeBar': False}
 
 # Geographical Map with regards to rating.
+st.title("Répartition géographique de la performance des magasins par ville")
+st.caption("La taille des bulles correspondent au nombre des notes; la couleur correspond à la note moyennne.")
 map_global = get_map_global(engine, selected_min_date, selected_max_date)
-st.plotly_chart(map_global)
+st.plotly_chart(map_global, config=config, use_container_width=True)
+
+metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
+# Pie chart Sentiment.
+metric_row2_col1.title("Répartition des sentiments")
+metric_row2_col1.caption("Négatif : note en dessous de 3; Neutre : note égale 3; Positif : note au dessus de 3.")
+pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
+metric_row2_col1.plotly_chart(pie_chart_sentiment_global, config=config, use_container_width=True)
+# Bar chart Group.
+metric_row2_col2.title("Répartition des sentiments par région")
+metric_row2_col2.caption("Les régions sont déjà définies par Castorama.")
+bar_chart_group_global = get_bar_chart_group_global(engine, selected_min_date, selected_max_date)
+metric_row2_col2.plotly_chart(bar_chart_group_global, config=config, use_container_width=True)
+
+metric_row3_col1, metric_row3_col2= st.columns((1, 1))
+# Bar chart NMF good topics.
+metric_row3_col1.title("Subjets positifs principaux")
+metric_row3_col1.caption("Distribution des sujets principaux par rapprot aux avis positifs.")
+bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_global(engine, selected_min_date, selected_max_date)
+metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
+# Bar chart NMF bad topics.
+metric_row3_col2.title("Subjets négatifs principaux")
+metric_row3_col2.caption("Distribution des sujets principaux par rapport aux avis négatifs.")
+bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_global(engine, selected_min_date, selected_max_date)
+metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)
+
+# metric_row3_col1, metric_row3_col2 = st.columns(2)
+# # Line chart Rating.
+# line_chart_rating_global = get_line_chart_rating_global(engine, selected_min_date, selected_max_date)
+# metric_row3_col1.plotly_chart(line_chart_rating_global)

@@ -21,7 +21,10 @@ def set_markdown_global():
         color: rgb(30, 103, 119);
         overflow-wrap: break-word;
     }
-    label[data-testid="stMetricLabel"] > div {
+    span[class="css-10trblm e16nr0p30"] {
+        font-size: 23px;
+    }
+    div[data-testid="stCaptionContainer"] {
         font-size: 16px;
     }
     div[data-testid="stMetricValue"] > div {
@@ -43,7 +46,10 @@ def set_markdown_par_magasin():
     color: rgb(30, 103, 119);
     overflow-wrap: break-word;
     }
-    label[data-testid="stMetricLabel"] > div {
+    span[class="css-10trblm e16nr0p30"] {
+        font-size: 23px;
+    }
+    div[data-testid="stCaptionContainer"] {
         font-size: 16px;
     }
     div[data-testid="stMetricValue"] > div {

@@ -28,7 +28,6 @@ def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_cit
         data_frame=df_pie_chart_sentiment,
         names="Sentiment",
         values="Sum",
-        title='Sentiment des avis',
         category_orders={"Sentiment": ["Négatif", "Neutre", "Positif"]},
         color="Sentiment",
         color_discrete_map={
@@ -36,11 +35,14 @@ def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_cit
             "Positif": "#00CC96",
             "Neutre": "#636EFA"})
     pie_chart_sentiment_par_magasin.update_layout(
-        autosize=False,
-        width=450,
-        height=450,
         font={"size": 15},
-        title_x=0.5)
+        margin=dict(l=15, r=15, t=15, b=15),
+        # legend=dict(
+        #     yanchor="top",
+        #     y=0.99,
+        #     xanchor="left",
+        #     x=0.005)
+    )
     return pie_chart_sentiment_par_magasin
 
 def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -55,15 +57,14 @@ def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_c
         name='Positif',
         orientation='h',
         marker=dict(
-           color='rgba(122, 120, 168, 0.8)',
-           line=dict(color='rgba(122, 120, 168, 0.8)', width=2)
+           color=df_bar_chart_good_topics['main_word'].value_counts().values,
+           colorscale="Emrld",
+           line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )
     ))
     bar_chart_good_topics.update_layout(
         barmode='stack',
         font={"size": 15},
-        title_x=0.5,
-        title_text="Sujets positifs principaux",
         xaxis=dict(
             showgrid=False,
             showline=False
@@ -74,7 +75,7 @@ def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_c
         ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=120, r=10, t=140, b=80))
+        margin=dict(l=15, r=15, t=15, b=15))
     bar_chart_good_topics.update_xaxes(categoryorder='total ascending')
     return bar_chart_good_topics
 
@@ -90,15 +91,14 @@ def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_ci
         name='Négatif',
         orientation='h',
         marker=dict(
-           color='rgba(122, 120, 168, 0.8)',
-           line=dict(color='rgba(122, 120, 168, 0.8)', width=2)
+           color=df_bar_chart_bad_topics['main_word'].value_counts().values,
+           colorscale="ylorrd",
+           line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )
     ))
     bar_chart_bad_topics.update_layout(
         barmode='stack',
         font={"size": 15},
-        title_x=0.5,
-        title_text="Sujets négatifs principaux",
         xaxis=dict(
             showgrid=False,
             showline=False
@@ -109,6 +109,6 @@ def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_ci
         ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=120, r=10, t=140, b=80))
+        margin=dict(l=15, r=15, t=15, b=15))
     bar_chart_bad_topics.update_xaxes(categoryorder='total ascending')
     return bar_chart_bad_topics
