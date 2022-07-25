@@ -66,18 +66,17 @@ config = {'displayModeBar': False}
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
-metric_row2_col1.caption("Négatif : note < 3; Neutre : note = 3; Positif : note > 3.")
 pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=config, use_container_width=True)
 
 metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 # Bar chart NMF good topics.
-metric_row3_col1.title("Subjets positifs principaux")
-metric_row3_col1.caption("Distribution des sujets principaux par rapprot aux avis positifs.")
+metric_row3_col1.title("Sujets positifs principaux")
+metric_row3_col1.caption("Distribution des sujets principaux des avis positifs.")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
 # Bar chart NMF bad topics.
-metric_row3_col2.title("Subjets négatifs principaux")
-metric_row3_col2.caption("Distribution des sujets principaux par rapport aux avis négatifs.")
+metric_row3_col2.title("Sujets négatifs principaux")
+metric_row3_col2.caption("Distribution des sujets principaux des avis négatifs.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)

@@ -49,31 +49,29 @@ config = {'displayModeBar': False}
 
 # Geographical Map with regards to rating.
 st.title("Répartition géographique de la performance des magasins par ville")
-st.caption("La taille des bulles correspondent au nombre des notes; la couleur correspond à la note moyennne.")
+st.caption("La taille des bulles correspond au nombre des notes et la couleur correspond à la note moyennne.")
 map_global = get_map_global(engine, selected_min_date, selected_max_date)
 st.plotly_chart(map_global, config=config, use_container_width=True)
 
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
-metric_row2_col1.caption("Négatif : note < 3; Neutre : note = 3; Positif : note > 3.")
 pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_global, config=config, use_container_width=True)
 # Bar chart Group.
 metric_row2_col2.title("Répartition des sentiments par région")
-metric_row2_col2.caption("Les régions sont déjà définies par Castorama.")
 bar_chart_group_global = get_bar_chart_group_global(engine, selected_min_date, selected_max_date)
 metric_row2_col2.plotly_chart(bar_chart_group_global, config=config, use_container_width=True)
 
 metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 # Bar chart NMF good topics.
-metric_row3_col1.title("Subjets positifs principaux")
-metric_row3_col1.caption("Distribution des sujets principaux par rapprot aux avis positifs.")
+metric_row3_col1.title("Sujets positifs principaux")
+metric_row3_col1.caption("Distribution des sujets principaux des avis positifs.")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_global(engine, selected_min_date, selected_max_date)
 metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
 # Bar chart NMF bad topics.
-metric_row3_col2.title("Subjets négatifs principaux")
-metric_row3_col2.caption("Distribution des sujets principaux par rapport aux avis négatifs.")
+metric_row3_col2.title("Sujets négatifs principaux")
+metric_row3_col2.caption("Distribution des sujets principaux des avis négatifs.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_global(engine, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)
 
