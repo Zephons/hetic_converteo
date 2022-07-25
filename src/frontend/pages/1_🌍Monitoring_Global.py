@@ -56,7 +56,7 @@ st.plotly_chart(map_global, config=config, use_container_width=True)
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
-metric_row2_col1.caption("Négatif : note en dessous de 3; Neutre : note égale 3; Positif : note au dessus de 3.")
+metric_row2_col1.caption("Négatif : note < 3; Neutre : note = 3; Positif : note > 3.")
 pie_chart_sentiment_global = get_pie_chart_sentiment_global(engine, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_global, config=config, use_container_width=True)
 # Bar chart Group.

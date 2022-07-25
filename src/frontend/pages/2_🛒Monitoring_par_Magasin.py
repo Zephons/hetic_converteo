@@ -66,7 +66,7 @@ config = {'displayModeBar': False}
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
-metric_row2_col1.caption("Négatif : note en dessous de 3; Neutre : note égale 3; Positif : note au dessus de 3.")
+metric_row2_col1.caption("Négatif : note < 3; Neutre : note = 3; Positif : note > 3.")
 pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=config, use_container_width=True)
 
