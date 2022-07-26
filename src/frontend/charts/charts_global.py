@@ -12,7 +12,7 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
         SELECT "Is Open" FROM public.shop_info;
     """
     sql_metrics = f"""
-        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics = pd.read_sql_query(sql_metrics, engine)
@@ -23,13 +23,13 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
 
 def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""
-        SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
+        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_global = px.pie(
         data_frame=df_pie_chart_sentiment,
         names="Sentiment",
-        values="Sum",
+        values="Nombre de notes",
         category_orders={"Sentiment": ["Négatif", "Neutre", "Positif"]},
         color="Sentiment",
         color_discrete_map={
@@ -49,7 +49,7 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
 
 def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_group = f"""
-        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
+        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
     """
     df_bar_chart_group_global = pd.read_sql_query(sql_bar_chart_group, engine)
     bar_chart_group_global = px.bar(
@@ -87,12 +87,13 @@ def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: da
 #         plot_bgcolor='rgba(0,0,0,0)')
 #     return line_chart_rating_global
 
-def get_map_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
+def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_map = f"""
-        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
+        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
     """
     df_map = pd.read_sql_query(sql_map, engine)
-    px.set_mapbox_access_token("pk.eyJ1IjoidHplcGhvbnMiLCJhIjoiY2w1cXcwbHBtMjFrMTNwcGE5OTB3bGE0NCJ9.e5LRf5icKvgz-UkD4055fQ")
+    mapbox_token = secrets.get("MAPBOX").get("ACCESS_TOKEN")
+    px.set_mapbox_access_token(mapbox_token)
     map_global = px.scatter_mapbox(
         df_map,
         lat="Latitude",

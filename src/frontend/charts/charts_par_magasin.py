@@ -12,7 +12,7 @@ def get_metrics_par_magasin(engine: engine.base.Engine, selected_city: str, sele
         SELECT "Group Name", "Is Open" FROM public.shop_info WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
     """
     sql_metrics = f"""
-        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}';
+        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics = pd.read_sql_query(sql_metrics, engine)
@@ -21,13 +21,13 @@ def get_metrics_par_magasin(engine: engine.base.Engine, selected_city: str, sele
 
 def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""
-        SELECT "Sentiment", SUM("Count") AS "Sum" FROM public.sentiment WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Sentiment";
+        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_par_magasin = px.pie(
         data_frame=df_pie_chart_sentiment,
         names="Sentiment",
-        values="Sum",
+        values="Nombre de notes",
         category_orders={"Sentiment": ["Négatif", "Neutre", "Positif"]},
         color="Sentiment",
         color_discrete_map={

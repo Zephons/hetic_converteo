@@ -49,6 +49,9 @@ def enrich(df_preprocessed: pd.DataFrame, df_city_matched: pd.DataFrame, file_se
     df_preprocessed["Sentiment"] = df_preprocessed["Rating"].apply(lambda x: "Négatif" if x<3 else ("Neutre" if x==3 else "Positif"))
     # Feature engineering. Extract date from datetime.
     df_preprocessed["Date"] = df_preprocessed["Creation date"].dt.date
+    # Feature engineering. Extract month (first day of the month) from datetime.
+    df_preprocessed["Month"] = df_preprocessed["Creation date"].to_numpy().astype('datetime64[M]')
+    df_preprocessed["Month"] = df_preprocessed["Month"].dt.date
     # Feature engineering. Compare with shop data to know if the shops are in operation.
     addresses_with_open_shop = (df_city_matched[df_city_matched["Is Open"] == True]["Address Without Number"].values)
     df_preprocessed["Is Open"] = df_preprocessed["Address Without Number"].apply(lambda x: True if x in addresses_with_open_shop else False)

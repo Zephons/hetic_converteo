@@ -36,20 +36,29 @@ sql_address = f"""
 df_address = pd.read_sql_query(sql_address, engine)
 selected_address = st.sidebar.selectbox("📍 Adresse :", df_address["Address Without Number"])
 
+# # Select a start date and an end date.
+# sql_dates = f"""
+#     SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
+# """
+# df_dates = pd.read_sql_query(sql_dates, engine)
+# min_date, max_date = df_dates.values[0]
+# default_date = min(date(2022, 1, 1), max_date)
+# selected_min_date = st.sidebar.date_input("📅 Date de début :", value=default_date, min_value=min_date, max_value=max_date)
+# selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
+
 # Select a start date and an end date.
 sql_dates = f"""
-    SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
+    SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
-default_date = min(date(2022, 1, 1), max_date)
-selected_min_date = st.sidebar.date_input("📅 Date de début :", value=default_date, min_value=min_date, max_value=max_date)
-selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
+selected_min_date, selected_max_date = st.sidebar.slider("📅 Période :", value=(min_date, max_date), min_value=min_date, max_value=max_date, format="MM/Y")
+st.sidebar.text(f"La période entre {selected_min_date.strftime('%m/%Y')} et {selected_max_date.strftime('%m/%Y')}.")
 
 set_about()
 
 # Shop info and KPIs (number of comments, number of ratings, average rating).
-st.title("KPIs")
+st.title(f"KPIs")
 group_name, is_open, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 status = "En activité" if is_open else "Fermé"
 average_rating = f"{aggregated_average_rating} / 5" if aggregated_average_rating else "—"

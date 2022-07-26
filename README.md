@@ -1,3 +1,12 @@
+## Project HETIC MD5 for Converteo x Castorama
+
+### Students :
+- Adrien DEMAEGDT
+- Étienne ROSEAU
+- Mohamed Khalil ASLI
+- Kahina BEHTANI
+- Zhifeng LIANG
+
 Run the application locally:
 
 1. Add the excel file "raw_datas_projet_M5D_Hetic.xlsx" in the [src/data](src/data/) folder.
