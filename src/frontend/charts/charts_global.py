@@ -13,7 +13,7 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
         SELECT "Is Open" FROM public.shop_info;
     """
     sql_metrics_global = f"""
-        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics = pd.read_sql_query(sql_metrics_global, engine)
@@ -24,7 +24,7 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
 
 def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""
-        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
+        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_global = px.pie(
@@ -50,7 +50,7 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
 
 def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_group = f"""
-        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
+        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
     """
     df_bar_chart_group_global = pd.read_sql_query(sql_bar_chart_group, engine)
     bar_chart_group_global = px.bar(
@@ -70,27 +70,9 @@ def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: da
         plot_bgcolor='rgba(0,0,0,0)')
     return bar_chart_group_global
 
-# def get_line_chart_rating_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
-#     sql_line_chart_rating = f"""
-#         SELECT "Date", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "Date" ORDER BY "Date";
-#     """
-#     df_line_chart_rating_global = pd.read_sql_query(sql_line_chart_rating, engine)
-#     line_chart_rating_global = px.line(
-#         data_frame=df_line_chart_rating_global,
-#         x="Date",
-#         y="Aggregated Average Rating",
-#         title='Évolution des notes')
-#     line_chart_rating_global.update_layout(
-#         font={"size": 15},
-#         title_x=0.5,
-#         xaxis_title=None,
-#         paper_bgcolor='rgba(0,0,0,0)',
-#         plot_bgcolor='rgba(0,0,0,0)')
-#     return line_chart_rating_global
-
 def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_map = f"""
-        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Nombre de notes", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Note moyenne" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
+        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Nombre de notes", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Note moyenne" FROM public.metrics_map WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
     """
     df_map = pd.read_sql_query(sql_map, engine)
     mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCESS_TOKEN")
@@ -119,17 +101,17 @@ def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date:
 
 def get_bar_chart_good_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_good_topics = f"""
-        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
+        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Sum";
     """
     df_bar_chart_good_topics = pd.read_sql_query(sql_bar_chart_good_topics, engine)
     bar_chart_good_topics = go.Figure()
     bar_chart_good_topics.add_trace(go.Bar(
-        y=df_bar_chart_good_topics["main_word"],
+        y=df_bar_chart_good_topics["Topic"],
         x=df_bar_chart_good_topics["Sum"],
         name='Positif',
         orientation='h',
         marker=dict(
-           color=df_bar_chart_good_topics['main_word'].value_counts().values,
+           color=df_bar_chart_good_topics['Topic'].value_counts().values,
            colorscale="Emrld",
            line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )
@@ -153,17 +135,17 @@ def get_bar_chart_good_topics_global(engine: engine.base.Engine, selected_min_da
 
 def get_bar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_bad_topics = f"""
-        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
+        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Sum";
     """
     df_bar_chart_bad_topics = pd.read_sql_query(sql_bar_chart_bad_topics, engine)
     bar_chart_bad_topics = go.Figure()
     bar_chart_bad_topics.add_trace(go.Bar(
-        y=df_bar_chart_bad_topics["main_word"],
+        y=df_bar_chart_bad_topics["Topic"],
         x=df_bar_chart_bad_topics["Sum"],
         name='Négatif',
         orientation='h',
         marker=dict(
-           color=df_bar_chart_bad_topics['main_word'].value_counts().values,
+           color=df_bar_chart_bad_topics['Topic'].value_counts().values,
            colorscale="ylorrd",
            line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )

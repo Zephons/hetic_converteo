@@ -21,7 +21,7 @@ engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 set_markdown_global()
 
-st.sidebar.image("src/images/Castorama-logo.png")
+st.sidebar.image(file_setting.get("CASTO_LOGO_1"))
 
 # Select a start date and an end date.
 # sql_dates = f"""
@@ -35,12 +35,12 @@ st.sidebar.image("src/images/Castorama-logo.png")
 
 # Select a start date and an end date.
 sql_dates = f"""
-    SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters_month;
+    SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters;
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
 selected_min_date, selected_max_date = st.sidebar.slider("📅 Période :", value=(min_date, max_date), min_value=min_date, max_value=max_date, format="MM/Y")
-st.sidebar.text(f"La période entre {selected_min_date.strftime('%m/%Y')} et {selected_max_date.strftime('%m/%Y')}.")
+st.sidebar.text(f"Période choisie : {selected_min_date.strftime('%m/%Y')} - {selected_max_date.strftime('%m/%Y')}")
 
 set_about()
 
@@ -76,12 +76,12 @@ metric_row2_col2.plotly_chart(bar_chart_group_global, config=config, use_contain
 metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 # Bar chart NMF good topics.
 metric_row3_col1.title("Sujets positifs principaux")
-metric_row3_col1.caption("Distribution des sujets principaux des avis positifs.")
+metric_row3_col1.caption("Nombre d'avis positifs par thématique client.")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_global(engine, selected_min_date, selected_max_date)
 metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
 # Bar chart NMF bad topics.
 metric_row3_col2.title("Sujets négatifs principaux")
-metric_row3_col2.caption("Distribution des sujets principaux des avis négatifs.")
+metric_row3_col2.caption("Nombre d'avis négatifs par thématique client.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_global(engine, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)
 

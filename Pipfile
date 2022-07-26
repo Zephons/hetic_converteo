@@ -12,8 +12,9 @@ plotly = "5.9.0"
 sqlalchemy = "1.4.39"
 psycopg2-binary = "2.9.3"
 fr_core_news_md = {file = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.4.0/fr_core_news_md-3.4.0.tar.gz"}
-geopandas = "==0.11.0"
-pyyaml = "==6.0"
+geopandas = "0.11.0"
+pyyaml = "6.0"
+wordcloud = "1.8.2.2"
 
 [dev-packages]
 

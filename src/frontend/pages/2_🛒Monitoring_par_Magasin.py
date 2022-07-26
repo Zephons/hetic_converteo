@@ -8,7 +8,7 @@ if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
-from src.frontend.charts.charts_par_magasin import get_metrics_par_magasin, get_pie_chart_sentiment_par_magasin, get_bar_chart_good_topics_par_magasin, get_bar_chart_bad_topics_par_magasin
+from src.frontend.charts.charts_par_magasin import get_metrics_par_magasin, get_pie_chart_sentiment_par_magasin, get_word_cloud, get_bar_chart_good_topics_par_magasin, get_bar_chart_bad_topics_par_magasin
 from src.frontend.charts.widgets_in_common import set_markdown_par_magasin, set_about
 
 
@@ -19,7 +19,7 @@ engine = create_engine(postgresql_uri.replace("postgres", "postgresql"))
 
 set_markdown_par_magasin()
 
-st.sidebar.image("src/images/Castorama-logo.png")
+st.sidebar.image(file_setting.get("CASTO_LOGO_1"))
 
 # Select a city.
 sql_city = """
@@ -48,12 +48,12 @@ selected_address = st.sidebar.selectbox("📍 Adresse :", df_address["Address Wi
 
 # Select a start date and an end date.
 sql_dates = f"""
-    SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
+    SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
 """
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
 selected_min_date, selected_max_date = st.sidebar.slider("📅 Période :", value=(min_date, max_date), min_value=min_date, max_value=max_date, format="MM/Y")
-st.sidebar.text(f"La période entre {selected_min_date.strftime('%m/%Y')} et {selected_max_date.strftime('%m/%Y')}.")
+st.sidebar.text(f"Période choisie : {selected_min_date.strftime('%m/%Y')} - {selected_max_date.strftime('%m/%Y')}")
 
 set_about()
 
@@ -78,15 +78,19 @@ metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 metric_row2_col1.title("Répartition des sentiments")
 pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=config, use_container_width=True)
+# Wordcloud.
+metric_row2_col2.title("Nuage de mots")
+word_cloud = get_word_cloud(engine, selected_city, selected_address, selected_min_date, selected_max_date)
+metric_row2_col2.pyplot(word_cloud)
 
 metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 # Bar chart NMF good topics.
 metric_row3_col1.title("Sujets positifs principaux")
-metric_row3_col1.caption("Distribution des sujets principaux des avis positifs.")
+metric_row3_col1.caption("Nombre d'avis positifs par thématique client.")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
 # Bar chart NMF bad topics.
 metric_row3_col2.title("Sujets négatifs principaux")
-metric_row3_col2.caption("Distribution des sujets principaux des avis négatifs.")
+metric_row3_col2.caption("Nombre d'avis négatifs par thématique client.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)

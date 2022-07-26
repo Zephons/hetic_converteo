@@ -21,7 +21,7 @@ def set_markdown_global():
         color: rgb(30, 103, 119);
         overflow-wrap: break-word;
     }
-    div[class="StyledThumbValue css-1sokk17 e88czh82"] {
+    div[class="StyledThumbValue css-jsz2xw e88czh82"] {
         color: transparent;
     }
     span[class="css-10trblm e16nr0p30"] {
@@ -49,7 +49,7 @@ def set_markdown_par_magasin():
     color: rgb(30, 103, 119);
     overflow-wrap: break-word;
     }
-    div[class="StyledThumbValue css-1sokk17 e88czh82"] {
+    div[class="StyledThumbValue css-jsz2xw e88czh82"] {
         color: transparent;
     }
     span[class="css-10trblm e16nr0p30"] {

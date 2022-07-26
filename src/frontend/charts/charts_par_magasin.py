@@ -1,21 +1,28 @@
 import pandas as pd
 import numpy as np
+from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 from plotly.graph_objs._figure import Figure
 from datetime import date
 from sqlalchemy import engine
 
+from src.backend.methods import get_file_setting
+
+
+file_setting = get_file_setting("settings.yml")
 
 def get_metrics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> np.ndarray:
     sql_shop_info = f"""
         SELECT "Group Name", "Is Open" FROM public.shop_info WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
     """
     sql_metrics_par_magasin = f"""
-        SELECT SUM("Number of Comments") AS "Sum Comments", SUM("Number of Ratings") AS "Sum Ratings", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+        SELECT SUM("Number of Comments") AS "Sum Comments", SUM("Number of Ratings") AS "Sum Ratings", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     sql_metrics_global = f"""
-        SELECT ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Comments per Shop", ROUND(SUM("Number of Ratings") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Ratings per Shop", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+        SELECT ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Comments per Shop", ROUND(SUM("Number of Ratings") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Ratings per Shop", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
     df_metrics_par_magasin = pd.read_sql_query(sql_metrics_par_magasin, engine)
@@ -28,7 +35,7 @@ def get_metrics_par_magasin(engine: engine.base.Engine, selected_city: str, sele
 
 def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""
-        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
+        SELECT "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Sentiment";
     """
     df_pie_chart_sentiment = pd.read_sql_query(sql_pie_chart_sentiment, engine)
     pie_chart_sentiment_par_magasin = px.pie(
@@ -52,19 +59,35 @@ def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_cit
     )
     return pie_chart_sentiment_par_magasin
 
+def get_word_cloud(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_wordcloud = f"""
+        SELECT "processed_content_fr" FROM public.wordcloud WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+    """
+    df_wordcloud = pd.read_sql_query(sql_wordcloud, engine)
+    casto_mask = np.array(Image.open(file_setting.get("CASTO_LOGO_2")))
+    casto_mask=np.where(casto_mask == 0, 255, casto_mask)
+    text = " ".join(str(review) for review in df_wordcloud["processed_content_fr"])
+    wc = WordCloud(background_color="white", max_words=100, mask=casto_mask, contour_color='firebrick')
+    word_cloud = plt.figure()
+    # Generate a wordcloud
+    wc.generate(text)
+    plt.imshow(wc, interpolation='bilinear')
+    plt.axis("off")
+    return word_cloud
+
 def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_good_topics = f"""
-        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
+        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic";
     """
     df_bar_chart_good_topics = pd.read_sql_query(sql_bar_chart_good_topics, engine)
     bar_chart_good_topics = go.Figure()
     bar_chart_good_topics.add_trace(go.Bar(
-        y=df_bar_chart_good_topics["main_word"],
+        y=df_bar_chart_good_topics["Topic"],
         x=df_bar_chart_good_topics["Sum"],
         name='Positif',
         orientation='h',
         marker=dict(
-           color=df_bar_chart_good_topics['main_word'].value_counts().values,
+           color=df_bar_chart_good_topics['Topic'].value_counts().values,
            colorscale="Emrld",
            line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )
@@ -88,17 +111,17 @@ def get_bar_chart_good_topics_par_magasin(engine: engine.base.Engine, selected_c
 
 def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_bad_topics = f"""
-        SELECT "main_word", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" <= '{selected_max_date}' GROUP BY "main_word" ORDER BY "Sum";
+        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic";
     """
     df_bar_chart_bad_topics = pd.read_sql_query(sql_bar_chart_bad_topics, engine)
     bar_chart_bad_topics = go.Figure()
     bar_chart_bad_topics.add_trace(go.Bar(
-        y=df_bar_chart_bad_topics["main_word"],
+        y=df_bar_chart_bad_topics["Topic"],
         x=df_bar_chart_bad_topics["Sum"],
         name='Négatif',
         orientation='h',
         marker=dict(
-           color=df_bar_chart_bad_topics['main_word'].value_counts().values,
+           color=df_bar_chart_bad_topics['Topic'].value_counts().values,
            colorscale="ylorrd",
            line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
         )

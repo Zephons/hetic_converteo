@@ -10,3 +10,7 @@ FILE:
       GEO_DATA: correspondance-code-insee-code-postal.json
       NMF_BAD_DATA: nmf_bad_reviews.csv
       NMF_GOOD_DATA: nmf_good_reviews.csv
+      WORDCLOUD_DATA: wordcloud.csv
+    IMAGES:
+      CASTO_LOGO_1: castorama_logo_1.png
+      CASTO_LOGO_2: castorama_logo_2.png

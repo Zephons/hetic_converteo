@@ -3,8 +3,8 @@
 ### Students :
 - Adrien DEMAEGDT
 - Étienne ROSEAU
-- Mohamed Khalil ASLI
 - Kahina BEHTANI
+- Mohamed Khalil ASLI
 - Zhifeng LIANG
 
 Run the application locally:

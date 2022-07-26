@@ -4,4 +4,4 @@ enableCORS = true
 
 [theme]
 base = "light"
-primaryColor = "purple"
+primaryColor = "#0071B9"
