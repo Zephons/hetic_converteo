@@ -23,7 +23,7 @@ st.sidebar.image("src/images/Castorama-logo.png")
 
 # Select a city.
 sql_city = """
-    SELECT DISTINCT "City" FROM public.filters;
+    SELECT DISTINCT "City" FROM public.filters ORDER BY "City";
 """
 df_city = pd.read_sql_query(sql_city, engine)
 index_paris = int(df_city.index[df_city["City"] == "Paris"][0])
@@ -59,15 +59,16 @@ set_about()
 
 # Shop info and KPIs (number of comments, number of ratings, average rating).
 st.title(f"KPIs")
-group_name, is_open, sum_comments, sum_ratings, aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
+group_name, is_open, sum_comments, diff_sum_comments, sum_ratings, diff_sum_ratings, aggregated_average_rating, diff_aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 status = "En activité" if is_open else "Fermé"
-average_rating = f"{aggregated_average_rating} / 5" if aggregated_average_rating else "—"
+average_rating = f"{round(float(aggregated_average_rating), 2)} / 5" if aggregated_average_rating else "—"
+diff_average_rating = round(float(diff_aggregated_average_rating), 2)
 metric_row1_col1, metric_row1_col2, metric_row1_col3, metric_row1_col4, metric_row1_col5 = st.columns((1, 1, 1, 1, 1))
 metric_row1_col1.metric("Statut", status)
 metric_row1_col2.metric("Région", group_name)
-metric_row1_col3.metric("Nombre d'avis", sum_comments)
-metric_row1_col4.metric("Nombre de notes", sum_ratings)
-metric_row1_col5.metric("Note moyenne", average_rating)
+metric_row1_col3.metric("Nombre d'avis", int(sum_comments), int(diff_sum_comments))
+metric_row1_col4.metric("Nombre de notes", int(sum_ratings), int(diff_sum_ratings))
+metric_row1_col5.metric("Note moyenne", average_rating, diff_average_rating)
 
 # Disable Plotly toolbar
 config = {'displayModeBar': False}

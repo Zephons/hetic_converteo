@@ -11,13 +11,20 @@ def get_metrics_par_magasin(engine: engine.base.Engine, selected_city: str, sele
     sql_shop_info = f"""
         SELECT "Group Name", "Is Open" FROM public.shop_info WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
     """
-    sql_metrics = f"""
-        SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+    sql_metrics_par_magasin = f"""
+        SELECT SUM("Number of Comments") AS "Sum Comments", SUM("Number of Ratings") AS "Sum Ratings", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
+    """
+    sql_metrics_global = f"""
+        SELECT ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Comments per Shop", ROUND(SUM("Number of Ratings") / COUNT(DISTINCT "Address Without Number"), 0) AS "Sum Ratings per Shop", AVG("Average Rating") AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
-    df_metrics = pd.read_sql_query(sql_metrics, engine)
-    metrics_par_magasin = np.append(df_shop_info.values[0], df_metrics.values[0])
-    return metrics_par_magasin
+    df_metrics_par_magasin = pd.read_sql_query(sql_metrics_par_magasin, engine)
+    df_metrics_global = pd.read_sql_query(sql_metrics_global, engine)
+    metrics_par_magasin = df_metrics_par_magasin.values[0]
+    metrics_global = df_metrics_global.values[0]
+    metrics_difference = metrics_par_magasin - metrics_global
+    metrics = np.append(df_shop_info.values[0], list(zip(metrics_par_magasin, metrics_difference)))
+    return metrics
 
 def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_pie_chart_sentiment = f"""

@@ -12,11 +12,11 @@ def get_metrics_global(engine: engine.base.Engine, selected_min_date: date, sele
     sql_shop_info = f"""
         SELECT "Is Open" FROM public.shop_info;
     """
-    sql_metrics = f"""
+    sql_metrics_global = f"""
         SELECT SUM("Number of Comments")::TEXT AS "Sum Comments", SUM("Number of Ratings")::TEXT AS "Sum Ratings", ROUND(SUM("Number of Comments") / COUNT(DISTINCT "Address Without Number"), 0)::TEXT AS "Sum Comments per Shop", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Aggregated Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}';
     """
     df_shop_info = pd.read_sql_query(sql_shop_info, engine)
-    df_metrics = pd.read_sql_query(sql_metrics, engine)
+    df_metrics = pd.read_sql_query(sql_metrics_global, engine)
     nb_shops_in_operation = sum(df_shop_info["Is Open"])
     nb_shops = len(df_shop_info)
     metrics_global = np.append((nb_shops_in_operation, nb_shops), df_metrics.values[0])
@@ -90,7 +90,7 @@ def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: da
 
 def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_map = f"""
-        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
+        SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Nombre de notes", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Note moyenne" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
     """
     df_map = pd.read_sql_query(sql_map, engine)
     mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCESS_TOKEN")
@@ -99,11 +99,11 @@ def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date:
         df_map,
         lat="Latitude",
         lon="Longitude",
-        color="Average Rating",
+        color="Note moyenne",
         # title="Répartition géographique de la performance des magasins par ville",
         hover_name="City",
-        hover_data=["Number of Ratings", "Average Rating"],
-        size="Number of Ratings",
+        hover_data=["Nombre de notes", "Note moyenne"],
+        size="Nombre de notes",
         color_continuous_scale=px.colors.diverging.RdYlGn,
         opacity=0.8,
         size_max=30,
