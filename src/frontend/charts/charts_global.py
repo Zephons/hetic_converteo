@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -92,7 +93,7 @@ def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date:
         SELECT "City", "Address Without Number", "Latitude", "Longitude", SUM("Number of Ratings") AS "Number of Ratings", ROUND(AVG("Average Rating")::NUMERIC, 2) AS "Average Rating" FROM public.metrics_map_month WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "City", "Address Without Number", "Latitude", "Longitude";
     """
     df_map = pd.read_sql_query(sql_map, engine)
-    mapbox_token = secrets.get("MAPBOX").get("ACCESS_TOKEN")
+    mapbox_token = os.environ.get("MAPBOX_TOKEN") or secrets.get("MAPBOX").get("ACCESS_TOKEN")
     px.set_mapbox_access_token(mapbox_token)
     map_global = px.scatter_mapbox(
         df_map,
