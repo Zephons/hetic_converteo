@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 from plotly.graph_objs._figure import Figure
 from datetime import date
 from sqlalchemy import engine
@@ -50,7 +49,7 @@ def get_pie_chart_sentiment_global(engine: engine.base.Engine, selected_min_date
 
 def get_bar_chart_group_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_group = f"""
-        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Sentiment", "Nombre de notes";
+        SELECT "Group Name" AS "Group", "Sentiment", SUM("Count") AS "Nombre de notes" FROM public.sentiment WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Group", "Sentiment" ORDER BY "Group", "Sentiment";
     """
     df_bar_chart_group_global = pd.read_sql_query(sql_bar_chart_group, engine)
     bar_chart_group_global = px.bar(
@@ -82,7 +81,6 @@ def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date:
         lat="Latitude",
         lon="Longitude",
         color="Note moyenne",
-        # title="Répartition géographique de la performance des magasins par ville",
         hover_name="City",
         hover_data=["Nombre de notes", "Note moyenne"],
         size="Nombre de notes",
@@ -101,68 +99,36 @@ def get_map_global(engine: engine.base.Engine, secrets: dict, selected_min_date:
 
 def get_bar_chart_good_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_good_topics = f"""
-        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_good WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Sum";
+        SELECT "Topic" AS "Sujet", SUM("Count") AS "Nombre d'avis" FROM public.nmf_good WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic" DESC;
     """
     df_bar_chart_good_topics = pd.read_sql_query(sql_bar_chart_good_topics, engine)
-    bar_chart_good_topics = go.Figure()
-    bar_chart_good_topics.add_trace(go.Bar(
-        y=df_bar_chart_good_topics["Topic"],
-        x=df_bar_chart_good_topics["Sum"],
-        name='Positif',
-        orientation='h',
-        marker=dict(
-           color=df_bar_chart_good_topics['Topic'].value_counts().values,
-           colorscale="Emrld",
-           line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
-        )
-    ))
+    bar_chart_good_topics = px.bar(
+        data_frame=df_bar_chart_good_topics,
+        x="Nombre d'avis",
+        y="Sujet",
+        color_discrete_sequence=["#00CC96"],
+        orientation="h")
     bar_chart_good_topics.update_layout(
-        barmode='stack',
         font={"size": 15},
-        xaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        yaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=15, r=15, t=15, b=15))
-    bar_chart_good_topics.update_xaxes(categoryorder='total ascending')
     return bar_chart_good_topics
 
 def get_bar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
     sql_bar_chart_bad_topics = f"""
-        SELECT "Topic", SUM("Count") AS "Sum" FROM public.nmf_bad WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Sum";
+        SELECT "Topic" AS "Sujet", SUM("Count") AS "Nombre d'avis" FROM public.nmf_bad WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic" DESC;
     """
     df_bar_chart_bad_topics = pd.read_sql_query(sql_bar_chart_bad_topics, engine)
-    bar_chart_bad_topics = go.Figure()
-    bar_chart_bad_topics.add_trace(go.Bar(
-        y=df_bar_chart_bad_topics["Topic"],
-        x=df_bar_chart_bad_topics["Sum"],
-        name='Négatif',
-        orientation='h',
-        marker=dict(
-           color=df_bar_chart_bad_topics['Topic'].value_counts().values,
-           colorscale="ylorrd",
-           line=dict(color='rgba(38, 24, 74, 0.8)', width=1)
-        )
-    ))
+    bar_chart_bad_topics = px.bar(
+        data_frame=df_bar_chart_bad_topics,
+        x="Nombre d'avis",
+        y="Sujet",
+        color_discrete_sequence=["#EF553B"],
+        orientation="h")
     bar_chart_bad_topics.update_layout(
-        barmode='stack',
         font={"size": 15},
-        xaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        yaxis=dict(
-            showgrid=False,
-            showline=False
-        ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=15, r=15, t=15, b=15))
-    bar_chart_bad_topics.update_xaxes(categoryorder='total ascending')
     return bar_chart_bad_topics

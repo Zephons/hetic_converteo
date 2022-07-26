@@ -2,7 +2,6 @@ import os
 import sys
 import pandas as pd
 import streamlit as st
-from datetime import date
 from sqlalchemy import create_engine
 if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
@@ -36,16 +35,6 @@ sql_address = f"""
 df_address = pd.read_sql_query(sql_address, engine)
 selected_address = st.sidebar.selectbox("📍 Adresse :", df_address["Address Without Number"])
 
-# # Select a start date and an end date.
-# sql_dates = f"""
-#     SELECT MIN("Date") AS "Min Date", MAX("Date") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
-# """
-# df_dates = pd.read_sql_query(sql_dates, engine)
-# min_date, max_date = df_dates.values[0]
-# default_date = min(date(2022, 1, 1), max_date)
-# selected_min_date = st.sidebar.date_input("📅 Date de début :", value=default_date, min_value=min_date, max_value=max_date)
-# selected_max_date = st.sidebar.date_input("📅 Date de fin :", value=max_date, min_value=selected_min_date, max_value=max_date)
-
 # Select a start date and an end date.
 sql_dates = f"""
     SELECT MIN("Month") AS "Min date", MAX("Month") AS "Max Date" FROM public.filters WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$;
@@ -71,13 +60,13 @@ metric_row1_col4.metric("Nombre de notes", int(sum_ratings), int(diff_sum_rating
 metric_row1_col5.metric("Note moyenne", average_rating, diff_average_rating)
 
 # Disable Plotly toolbar
-config = {'displayModeBar': False}
+plotly_config = {'displayModeBar': False}
 
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
 pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
-metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=config, use_container_width=True)
+metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=plotly_config, use_container_width=True)
 # Wordcloud.
 metric_row2_col2.title("Nuage de mots")
 word_cloud = get_word_cloud(engine, selected_city, selected_address, selected_min_date, selected_max_date)
@@ -88,9 +77,9 @@ metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 metric_row3_col1.title("Sujets positifs principaux")
 metric_row3_col1.caption("Nombre d'avis positifs par thématique client.")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
-metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=config, use_container_width=True)
+metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=plotly_config, use_container_width=True)
 # Bar chart NMF bad topics.
 metric_row3_col2.title("Sujets négatifs principaux")
 metric_row3_col2.caption("Nombre d'avis négatifs par thématique client.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
-metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=config, use_container_width=True)
+metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=plotly_config, use_container_width=True)
