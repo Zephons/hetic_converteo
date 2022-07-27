@@ -7,7 +7,7 @@ from wordcloud import WordCloud
 from plotly.graph_objs._figure import Figure
 from datetime import date
 from sqlalchemy import engine
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 from src.backend.methods import get_file_setting
 
@@ -50,7 +50,7 @@ def get_pie_chart_sentiment_par_magasin(engine: engine.base.Engine, selected_cit
             "Neutre": "#636EFA"})
     pie_chart_sentiment_par_magasin.update_layout(
         font={"size": 15},
-        margin=dict(l=15, r=15, t=30, b=15),
+        margin=dict(l=15, r=15, t=15, b=15),
         # legend=dict(
         #     yanchor="top",
         #     y=0.99,
@@ -113,7 +113,7 @@ def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_ci
 
 def get_table_raw_comments(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> None:
     sql_table_raw_comments = f"""
-        SELECT "Date", "Rating" AS "Note", "Content" AS "Avis" FROM public.raw_comments WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" < '{selected_max_date}' ORDER BY "Date";
+        SELECT "Date", "Topic" AS "Sujet", "Rating" AS "Note", "Content_fr" AS "Commentaire" FROM public.raw_comments WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" < '{selected_max_date}' ORDER BY "Date" DESC;
     """
     df_table_raw_comments = pd.read_sql_query(sql_table_raw_comments, engine)
     gb = GridOptionsBuilder.from_dataframe(df_table_raw_comments)

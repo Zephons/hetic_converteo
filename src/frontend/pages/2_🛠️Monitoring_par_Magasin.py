@@ -42,12 +42,13 @@ sql_dates = f"""
 df_dates = pd.read_sql_query(sql_dates, engine)
 min_date, max_date = df_dates.values[0]
 selected_min_date, selected_max_date = st.sidebar.slider("📅 Période :", value=(min_date, max_date), min_value=min_date, max_value=max_date, format="MM/Y")
-st.sidebar.text(f"Période choisie : {selected_min_date.strftime('%m/%Y')} - {selected_max_date.strftime('%m/%Y')}")
+st.sidebar.markdown(f"Période sélectionnée : {selected_min_date.strftime('%m / %Y')} - {selected_max_date.strftime('%m / %Y')}")
 
 set_about()
 
 # Shop info and KPIs (number of comments, number of ratings, average rating).
-st.title(f"KPIs")
+st.title("KPIs")
+st.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 group_name, is_open, sum_comments, diff_sum_comments, sum_ratings, diff_sum_ratings, aggregated_average_rating, diff_aggregated_average_rating = get_metrics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 status = "En activité" if is_open else "Fermé"
 average_rating = f"{round(float(aggregated_average_rating), 2)} / 5" if aggregated_average_rating else "—"
@@ -65,26 +66,28 @@ plotly_config = {'displayModeBar': False}
 metric_row2_col1, metric_row2_col2 = st.columns((1, 1))
 # Pie chart Sentiment.
 metric_row2_col1.title("Répartition des sentiments")
+metric_row2_col1.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 pie_chart_sentiment_par_magasin = get_pie_chart_sentiment_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row2_col1.plotly_chart(pie_chart_sentiment_par_magasin, config=plotly_config, use_container_width=True)
 # Wordcloud.
 metric_row2_col2.title("Nuage de mots")
+metric_row2_col2.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 word_cloud = get_word_cloud(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row2_col2.pyplot(word_cloud)
 
 metric_row3_col1, metric_row3_col2= st.columns((1, 1))
 # Bar chart NMF good topics.
-metric_row3_col1.title("Sujets positifs principaux")
-metric_row3_col1.caption("Nombre d'avis positifs par thématique client.")
+metric_row3_col1.title("Nombre d'avis positifs par thématique client")
+metric_row3_col1.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 bar_chart_good_topics_par_magasin = get_bar_chart_good_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col1.plotly_chart(bar_chart_good_topics_par_magasin, config=plotly_config, use_container_width=True)
 # Bar chart NMF bad topics.
-metric_row3_col2.title("Sujets négatifs principaux")
-metric_row3_col2.caption("Nombre d'avis négatifs par thématique client.")
+metric_row3_col2.title("Nombre d'avis négatifs par thématique client")
+metric_row3_col2.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=plotly_config, use_container_width=True)
 
 # Table raw comments.
-st.title("Avis bruts")
-st.caption("Les avis clients de Castorama sur les plateformes Google.")
+st.title(f"Ensemble des commentaires")
+st.markdown(f"Du Magasin à {selected_address}, {selected_city}")
 get_table_raw_comments(engine, selected_city, selected_address, selected_min_date, selected_max_date)

@@ -13,6 +13,13 @@ set_markdown_home()
 
 st.sidebar.image(file_setting.get("CASTO_LOGO_1"))
 
-st.header("Architecture de l'application")
+st.markdown("""
+## Architecture de l'application
+&nbsp;
+&nbsp;
+""")
+# st.text("")
+
+st.image(file_setting.get("ARCHITECTURE"))
 
 set_about()
