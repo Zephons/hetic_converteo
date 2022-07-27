@@ -15,6 +15,7 @@ fr_core_news_md = {file = "https://github.com/explosion/spacy-models/releases/do
 geopandas = "0.11.0"
 pyyaml = "6.0"
 wordcloud = "1.8.2.2"
+streamlit-aggrid = "0.2.3.post2"
 
 [dev-packages]
 

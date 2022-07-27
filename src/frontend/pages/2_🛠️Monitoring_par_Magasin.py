@@ -7,7 +7,7 @@ if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
 from src.backend.methods import get_file_setting, get_secrets
-from src.frontend.charts.charts_par_magasin import get_metrics_par_magasin, get_pie_chart_sentiment_par_magasin, get_word_cloud, get_bar_chart_good_topics_par_magasin, get_bar_chart_bad_topics_par_magasin
+from src.frontend.charts.charts_par_magasin import get_metrics_par_magasin, get_pie_chart_sentiment_par_magasin, get_word_cloud, get_bar_chart_good_topics_par_magasin, get_bar_chart_bad_topics_par_magasin, get_table_raw_comments
 from src.frontend.charts.widgets_in_common import set_markdown_par_magasin, set_about
 
 
@@ -83,3 +83,8 @@ metric_row3_col2.title("Sujets négatifs principaux")
 metric_row3_col2.caption("Nombre d'avis négatifs par thématique client.")
 bar_chart_bad_topics_par_magasin = get_bar_chart_bad_topics_par_magasin(engine, selected_city, selected_address, selected_min_date, selected_max_date)
 metric_row3_col2.plotly_chart(bar_chart_bad_topics_par_magasin, config=plotly_config, use_container_width=True)
+
+# Table raw comments.
+st.title("Avis bruts")
+st.caption("Les avis clients de Castorama sur les plateformes Google.")
+get_table_raw_comments(engine, selected_city, selected_address, selected_min_date, selected_max_date)

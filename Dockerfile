@@ -8,4 +8,4 @@ COPY .streamlit $WORKDIR/.streamlit
 RUN pip install pipenv && pipenv install --system
 # Remove "--server.port $PORT" for local run this docker image
 # "--server.port $PORT" here is specific for Heroku
-CMD streamlit run $WORKDIR/src/frontend/🏘️Home.py --server.port $PORT
+CMD streamlit run $WORKDIR/src/frontend/🏠Home.py --server.port $PORT

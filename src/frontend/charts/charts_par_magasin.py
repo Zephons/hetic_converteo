@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
-from PIL import Image
 import plotly.express as px
 import matplotlib.pyplot as plt
+from PIL import Image
 from wordcloud import WordCloud
 from plotly.graph_objs._figure import Figure
 from datetime import date
 from sqlalchemy import engine
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 
 from src.backend.methods import get_file_setting
 
@@ -109,3 +110,13 @@ def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_ci
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=15, r=15, t=15, b=15))
     return bar_chart_bad_topics
+
+def get_table_raw_comments(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> None:
+    sql_table_raw_comments = f"""
+        SELECT "Date", "Rating" AS "Note", "Sentiment", "Content" AS "Avis" FROM public.raw_comments WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" < '{selected_max_date}' ORDER BY "Date";
+    """
+    df_table_raw_comments = pd.read_sql_query(sql_table_raw_comments, engine)
+    gb = GridOptionsBuilder.from_dataframe(df_table_raw_comments)
+    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+    gridOptions = gb.build()
+    AgGrid(df_table_raw_comments, gridOptions=gridOptions, height=500, width='100%', theme="fresh")
