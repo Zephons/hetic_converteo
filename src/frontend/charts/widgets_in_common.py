@@ -68,6 +68,6 @@ def set_markdown_par_magasin():
 def set_about():
     st.sidebar.title("À propos")
     st.sidebar.info("""
-        Code source : [github.com/Zephons/hetic_converteo](https://github.com/Zephons/hetic_converteo)
+        Cette application est un outil de veille construit par un groupe d'étudiants de l'HETIC pour le cabinet de conseil Converteo. L'objectif de cet outil est de suivre les insights consommateurs sur Castorama, distributeur français d'outils et de fournitures de bricolage.
     """
     )
