@@ -49,5 +49,5 @@ df_wordcloud = load_nlp_data(file_setting.get("WORDCLOUD_DATA"))
 df_wordcloud.to_sql(name="wordcloud", con=engine, if_exists="replace")
 
 # Create SQL table for the table of raw comments.
-df_raw_comments = df_enriched[["City", "Address Without Number", "Date", "Content", "Sentiment", "Rating"]].dropna(subset=["Content"]).drop_duplicates().sort_values(by=["City", "Address Without Number", "Date"], ignore_index=True)
+df_raw_comments = df_enriched[["City", "Address Without Number", "Date", "Content", "Rating"]].dropna(subset=["Content"]).drop_duplicates().sort_values(by=["City", "Address Without Number", "Date"], ignore_index=True)
 df_raw_comments.to_sql(name="raw_comments", con=engine, if_exists="replace")

@@ -113,7 +113,7 @@ def get_bar_chart_bad_topics_par_magasin(engine: engine.base.Engine, selected_ci
 
 def get_table_raw_comments(engine: engine.base.Engine, selected_city: str, selected_address: str, selected_min_date: date, selected_max_date: date) -> None:
     sql_table_raw_comments = f"""
-        SELECT "Date", "Rating" AS "Note", "Sentiment", "Content" AS "Avis" FROM public.raw_comments WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" < '{selected_max_date}' ORDER BY "Date";
+        SELECT "Date", "Rating" AS "Note", "Content" AS "Avis" FROM public.raw_comments WHERE "City" = $${selected_city}$$ AND "Address Without Number" = $${selected_address}$$ AND "Date" >= '{selected_min_date}' AND "Date" < '{selected_max_date}' ORDER BY "Date";
     """
     df_table_raw_comments = pd.read_sql_query(sql_table_raw_comments, engine)
     gb = GridOptionsBuilder.from_dataframe(df_table_raw_comments)
