@@ -132,3 +132,45 @@ def get_bar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_dat
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=15, r=15, t=15, b=15))
     return bar_chart_bad_topics
+
+def get_radar_chart_good_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_radar_chart_good_topics = f"""
+        SELECT "Topic" AS "Sujet", SUM("Count") AS "Nombre d'avis" FROM public.nmf_good WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic" DESC;
+    """
+    df_radar_chart_good_topics = pd.read_sql_query(sql_radar_chart_good_topics, engine)
+    radar_chart_good_topics = px.line_polar(
+        data_frame=df_radar_chart_good_topics,
+        r="Nombre d'avis",
+        theta="Sujet",
+        color_discrete_sequence=["#00CC96"],
+        line_close=True)
+    radar_chart_good_topics.update_traces(
+        fillcolor='#00CC96',
+        fill="toself",
+        # opacity=0.7
+        )
+    radar_chart_good_topics.update_layout(
+        font={"size": 15},
+        margin=dict(l=20, r=20, t=20, b=20))
+    return radar_chart_good_topics
+
+def get_radar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
+    sql_radar_chart_good_topics = f"""
+        SELECT "Topic" AS "Sujet", SUM("Count") AS "Nombre d'avis" FROM public.nmf_bad WHERE "Month" >= '{selected_min_date}' AND "Month" <= '{selected_max_date}' GROUP BY "Topic" ORDER BY "Topic" DESC;
+    """
+    df_radar_chart_bad_topics = pd.read_sql_query(sql_radar_chart_good_topics, engine)
+    radar_chart_bad_topics = px.line_polar(
+        data_frame=df_radar_chart_bad_topics,
+        r="Nombre d'avis",
+        theta="Sujet",
+        color_discrete_sequence=["#EF553B"],
+        line_close=True)
+    radar_chart_bad_topics.update_traces(
+        fillcolor='#EF553B',
+        fill="toself",
+        # opacity=0.7
+        )
+    radar_chart_bad_topics.update_layout(
+        font={"size": 15},
+        margin=dict(l=20, r=20, t=20, b=20))
+    return radar_chart_bad_topics
