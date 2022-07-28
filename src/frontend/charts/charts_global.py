@@ -148,10 +148,11 @@ def get_radar_chart_good_topics_global(engine: engine.base.Engine, selected_min_
         fillcolor='#00CC96',
         fill="toself",
         # opacity=0.7
-        )
+    )
     radar_chart_good_topics.update_layout(
         font={"size": 15},
-        margin=dict(l=20, r=20, t=20, b=20))
+        margin=dict(t=30, b=30)
+    )
     return radar_chart_good_topics
 
 def get_radar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_date: date, selected_max_date: date) -> Figure:
@@ -169,8 +170,9 @@ def get_radar_chart_bad_topics_global(engine: engine.base.Engine, selected_min_d
         fillcolor='#EF553B',
         fill="toself",
         # opacity=0.7
-        )
+    )
     radar_chart_bad_topics.update_layout(
         font={"size": 15},
-        margin=dict(l=20, r=20, t=20, b=20))
+        margin=dict(t=30, b=30)
+    )
     return radar_chart_bad_topics
