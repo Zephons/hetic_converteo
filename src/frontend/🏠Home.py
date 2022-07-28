@@ -20,6 +20,6 @@ st.markdown("""
 """)
 # st.text("")
 
-st.image(file_setting.get("ARCHITECTURE"))
+st.image(image=file_setting.get("ARCHITECTURE"), width=1200)
 
 set_about()

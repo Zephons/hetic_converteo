@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def set_markdown_home():
     st.set_page_config(page_title="Dashboard Castorama", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
     st.markdown("""
